@@ -76,19 +76,22 @@ randomization is an instrument that can silently unblind a study.
 The study data are bundled with the package. Real files rarely use the column name
 you expect, so `read_ema()` takes the name of the timestamp column.
 
-```{r}
+```{r, error = TRUE}
 path <- system.file("extdata", "melatonin_ema.csv", package = "nof1kit")
 ema <- read_ema(path, start_date = "2026-02-18", timestamp_col = "datetime")
-
-nrow(ema)
-range(ema$timestamp)
 ```
 
-`validate_ema()` runs the checks that matter before analysis: values outside their
-declared range, duplicate timestamps, missing values in required columns, and
-records outside the study period.
+That error is not a demonstration. It is a real defect in a real dataset, found by
+writing this vignette.
+
+The file carries its own `study_day` column, and for 68 of 195 records that column
+disagrees with the calendar. Reading with a `start_date` makes the two indices
+meet, so the conflict surfaces immediately. Reading without one accepts the file's
+index, and `validate_ema()` catches it instead:
 
 ```{r}
+ema <- read_ema(path, timestamp_col = "datetime")
+
 v <- validate_ema(
   ema,
   ranges = list(mood = c(0, 100), agency = c(0, 100),
@@ -96,12 +99,19 @@ v <- validate_ema(
   n_days = 70
 )
 v
+subset(v$issues, check == "inconsistent_study_day")
 ```
 
-The result is data, not a printed report. A pipeline that must not proceed on bad
-input can act on it directly:
+One study day covering two calendar dates shifts every record after it. Here the
+shift runs for the final 27 days of the study, and it is invisible to the checks
+most pipelines actually perform: the values are all in range, no timestamps are
+duplicated, nothing is missing, and every `study_day` sits inside `1:70`. Only
+comparing the index against the calendar reveals it.
 
-```{r}
+The result is data, not a printed report, so a pipeline that must not proceed on
+bad input can act on it:
+
+```{r, error = TRUE}
 stopifnot(v$n_issues == 0)
 ```
 

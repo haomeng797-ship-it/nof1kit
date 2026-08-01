@@ -104,3 +104,51 @@ test_that("compliance handles a study that has not started", {
                    through = as.POSIXct("2026-02-18 10:00:00", tz = "UTC"))
   expect_true(is.na(cp$rate))
 })
+
+test_that("read_ema errors when study_day disagrees with the calendar", {
+  f <- make_csv(c(
+    "timestamp,study_day",
+    "2026-02-18T09:00:00Z,1",
+    "2026-02-19T09:00:00Z,2",
+    "2026-02-20T09:00:00Z,2"   # should be 3
+  ))
+  expect_error(read_ema(f, start_date = "2026-02-18"), "disagrees with the calendar")
+})
+
+test_that("read_ema accepts the file's index when no start_date is given", {
+  f <- make_csv(c(
+    "timestamp,study_day",
+    "2026-02-18T09:00:00Z,1",
+    "2026-02-20T09:00:00Z,2"
+  ))
+  d <- read_ema(f)
+  expect_equal(d$study_day, c(1L, 2L))
+})
+
+test_that("validate_ema flags one study_day spanning two dates", {
+  d <- data.frame(
+    timestamp = as.POSIXct(c("2026-04-02 09:00:00", "2026-04-03 09:00:00"), tz = "UTC"),
+    study_day = c(44L, 44L)
+  )
+  v <- validate_ema(d, n_days = 70)
+  expect_true("inconsistent_study_day" %in% v$issues$check)
+})
+
+test_that("validate_ema flags one date carrying two study_days", {
+  d <- data.frame(
+    timestamp = as.POSIXct(c("2026-04-02 09:00:00", "2026-04-02 21:00:00"), tz = "UTC"),
+    study_day = c(44L, 45L)
+  )
+  v <- validate_ema(d, n_days = 70)
+  expect_true("inconsistent_study_day" %in% v$issues$check)
+})
+
+test_that("a consistent index passes", {
+  d <- data.frame(
+    timestamp = as.POSIXct(c("2026-02-18 09:00:00", "2026-02-18 21:00:00",
+                             "2026-02-19 09:00:00"), tz = "UTC"),
+    study_day = c(1L, 1L, 2L)
+  )
+  v <- validate_ema(d, n_days = 70)
+  expect_false("inconsistent_study_day" %in% v$issues$check)
+})

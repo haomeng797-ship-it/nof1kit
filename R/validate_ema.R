@@ -92,6 +92,35 @@ validate_ema <- function(data,
     }
   }
 
+  # study_day must be a consistent function of the calendar date. One index
+  # covering two dates, or one date carrying two indices, silently shifts every
+  # record after it and no range check will notice.
+  if (all(c("study_day", "timestamp") %in% names(data))) {
+    ok <- !is.na(data$study_day) & !is.na(data$timestamp)
+    if (any(ok)) {
+      map <- unique(data.frame(
+        date = as.Date(data$timestamp[ok]),
+        day  = as.integer(data$study_day[ok])
+      ))
+      # one study_day spanning several calendar dates
+      per_day <- table(map$day)
+      for (d in names(per_day[per_day > 1])) {
+        dates <- sort(map$date[map$day == as.integer(d)])
+        i <- which(ok)[match(as.integer(d), data$study_day[ok])]
+        add("inconsistent_study_day", i, "study_day",
+            sprintf("day %s spans %s", d, paste(format(dates), collapse = " and ")))
+      }
+      # one calendar date carrying several study_day values
+      per_date <- table(as.character(map$date))
+      for (dt in names(per_date[per_date > 1])) {
+        days <- sort(map$day[as.character(map$date) == dt])
+        i <- which(ok)[match(as.Date(dt), as.Date(data$timestamp[ok]))]
+        add("inconsistent_study_day", i, "study_day",
+            sprintf("%s carries days %s", dt, paste(days, collapse = " and ")))
+      }
+    }
+  }
+
   tbl <- if (length(issues)) do.call(rbind, issues) else
     data.frame(check = character(0), row = integer(0),
                column = character(0), detail = character(0),

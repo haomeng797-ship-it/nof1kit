@@ -60,9 +60,33 @@ read_ema <- function(path, start_date = NULL, tz = "UTC",
             " could not be parsed and are NA.", call. = FALSE)
   }
 
-  if (is.null(dat$study_day) && !is.null(start_date)) {
+  if (!is.null(start_date)) {
     start <- as.Date(start_date)
-    dat$study_day <- as.integer(as.Date(dat$timestamp, tz = tz) - start) + 1L
+    derived <- as.integer(as.Date(dat$timestamp, tz = tz) - start) + 1L
+
+    if (is.null(dat$study_day)) {
+      dat$study_day <- derived
+    } else {
+      # A study_day column that disagrees with the calendar means the index and
+      # the timestamps are telling different stories, and every downstream
+      # analysis has to pick one. Fail loudly rather than silently trusting the
+      # file, which is what makes this class of error survive to publication.
+      existing <- suppressWarnings(as.integer(dat$study_day))
+      disagree <- which(!is.na(existing) & !is.na(derived) & existing != derived)
+      if (length(disagree)) {
+        first <- disagree[1]
+        stop(
+          sprintf(
+            paste0("`study_day` in the file disagrees with the calendar for %d of %d records.\n",
+                   "  First at row %d: %s is day %s in the file, day %s counting from %s.\n",
+                   "  Resolve which index is correct, or drop start_date to accept the file's."),
+            length(disagree), nrow(dat), first,
+            format(dat$timestamp[first], "%Y-%m-%d"),
+            existing[first], derived[first], format(start)),
+          call. = FALSE
+        )
+      }
+    }
   }
 
   dat[order(dat$timestamp), , drop = FALSE]
