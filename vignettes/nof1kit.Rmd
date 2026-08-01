@@ -1,0 +1,174 @@
+---
+title: "Running an N-of-1 study end to end"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running an N-of-1 study end to end}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(nof1kit)
+```
+
+A single-case (N-of-1) experiment has four stages: design a randomization
+schedule, collect data against it, check what came back, and analyze it. Packages
+for single-case analysis are plentiful. The first three stages are usually
+hand-rolled, which is where the errors live.
+
+This vignette walks all four, using a real study: 70 days, three prompts a day,
+melatonin randomized nightly. The data shipped with the package are the ones
+actually collected.
+
+## 1. Design
+
+`design_schedule()` produces a balanced sequence with a cap on how many identical
+days may run consecutively. Long runs of the same condition confound the
+intervention with time, so a run-length constraint is standard practice in N-of-1
+designs. The seed is required, not optional: a preregistered schedule has to be
+reproducible from what is written in the preregistration.
+
+```{r}
+sched <- design_schedule(n_days = 70, max_run = 2, seed = 20260218)
+head(sched, 12)
+```
+
+The sampling is exact rather than by rejection. For a balanced 70-day design with
+`max_run = 2`, fewer than one permutation in a million satisfies the constraint,
+so drawing until one fits is not workable. Instead the number of valid completions
+from each intermediate state is counted by dynamic programming, and the sequence
+is drawn day by day in proportion to those counts. The result is a uniform draw
+over all valid schedules: no admissible sequence is more likely than any other.
+That is a stronger property than blocked randomization, which restricts the
+sample space in ways that are rarely stated.
+
+`check_schedule()` reports what a reviewer, or a preregistration reader, would
+want to see.
+
+```{r}
+check_schedule(sched)
+```
+
+Balanced counts, no run longer than two, and a negative lag-1 autocorrelation,
+which is what the run cap buys: the sequence alternates more than chance would.
+
+## 2. Hand the schedule to the collection tool
+
+`write_schedule()` writes the day-to-condition mapping as JSON.
+
+```{r}
+f <- tempfile(fileext = ".json")
+write_schedule(sched, f)
+cat(substr(readLines(f), 1, 90))
+```
+
+That format is what the companion iOS app and Shortcut both read, so a schedule
+designed here can be loaded onto a phone without an intermediate step. Generation
+and execution stay separate on purpose: an instrument that can also rewrite the
+randomization is an instrument that can silently unblind a study.
+
+## 3. Read what came back, and check it
+
+The study data are bundled with the package. Real files rarely use the column name
+you expect, so `read_ema()` takes the name of the timestamp column.
+
+```{r}
+path <- system.file("extdata", "melatonin_ema.csv", package = "nof1kit")
+ema <- read_ema(path, start_date = "2026-02-18", timestamp_col = "datetime")
+
+nrow(ema)
+range(ema$timestamp)
+```
+
+`validate_ema()` runs the checks that matter before analysis: values outside their
+declared range, duplicate timestamps, missing values in required columns, and
+records outside the study period.
+
+```{r}
+v <- validate_ema(
+  ema,
+  ranges = list(mood = c(0, 100), agency = c(0, 100),
+                metacognition = c(0, 100), melatonin = c(0, 1)),
+  n_days = 70
+)
+v
+```
+
+The result is data, not a printed report. A pipeline that must not proceed on bad
+input can act on it directly:
+
+```{r}
+stopifnot(v$n_issues == 0)
+```
+
+## 4. Compliance, and why the definition matters
+
+Compliance in EMA studies is usually reported as records divided by prompts. On
+these data that gives:
+
+```{r}
+records <- nrow(ema)
+prompts <- 70 * 3
+round(100 * records / prompts, 1)
+```
+
+`compliance()` computes something different: the proportion of scheduled prompts
+that received a response *inside their response window*.
+
+```{r}
+cp <- compliance(
+  ema,
+  start_date = "2026-02-18",
+  n_days = 70,
+  times = c("10:00", "16:00", "22:00"),
+  window = 3
+)
+cp
+```
+
+The two numbers differ by about three points on the same data, for two reasons.
+A prompt answered three times counts once here, not three times. And a record
+arriving outside every window is data, but it is not evidence that a prompt was
+answered when it was asked.
+
+Neither number is wrong. They answer different questions, and a paper reporting
+"compliance" without saying which one leaves the reader unable to tell. The
+prompt-level detail is available when the headline number needs unpacking:
+
+```{r}
+tapply(cp$prompts$answered, cp$prompts$time, mean)
+```
+
+Response rates were not equal across the day. Whether the pattern is large enough
+to matter is a judgement about the study, but it is the kind of thing worth seeing
+before treating missingness as random.
+
+## 5. Analysis
+
+From here the data are ordinary. `nof1kit` deliberately stops at the boundary of
+analysis: intensive longitudinal data are well served by existing tools, and the
+gap this package fills is upstream of them.
+
+```{r, eval = FALSE}
+library(lme4)
+lmer(mood ~ melatonin + (1 | study_day), data = ema)
+```
+
+## Summary
+
+```{r, eval = FALSE}
+sched <- design_schedule(n_days = 70, max_run = 2, seed = 20260218)
+write_schedule(sched, "schedule.json")     # onto the phone
+
+ema <- read_ema("export.csv", start_date = "2026-02-18")
+validate_ema(ema, ranges = list(mood = c(0, 100)), n_days = 70)
+compliance(ema, start_date = "2026-02-18", n_days = 70,
+           times = c("09:00", "15:00", "21:00"))
+```
+
+Four functions cover design, handoff, quality control, and compliance. What
+happens after that is what the rest of the R ecosystem is for.

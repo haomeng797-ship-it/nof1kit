@@ -14,6 +14,9 @@
 #'   began. Used to compute `study_day` when the file does not already have it.
 #' @param tz Time zone to interpret timestamps in. Defaults to `"UTC"`, which
 #'   matches the ISO 8601 output of the companion app.
+#' @param timestamp_col Name of the column holding the timestamp. Real files
+#'   call it many things (`datetime`, `time`, `recorded_at`); give the name here
+#'   and it is renamed to `timestamp` on the way in.
 #'
 #' @return A data frame with `timestamp` as `POSIXct`, `study_day` as integer
 #'   when derivable, and all other columns unchanged.
@@ -23,7 +26,8 @@
 #' if (nzchar(f)) head(read_ema(f))
 #'
 #' @export
-read_ema <- function(path, start_date = NULL, tz = "UTC") {
+read_ema <- function(path, start_date = NULL, tz = "UTC",
+                     timestamp_col = "timestamp") {
   if (!file.exists(path)) {
     stop("File not found: ", path, call. = FALSE)
   }
@@ -39,9 +43,13 @@ read_ema <- function(path, start_date = NULL, tz = "UTC") {
   if (!is.data.frame(dat)) {
     stop("The file did not parse into a table of records.", call. = FALSE)
   }
-  if (!"timestamp" %in% names(dat)) {
-    stop("No `timestamp` column found. Columns present: ",
-         paste(names(dat), collapse = ", "), call. = FALSE)
+  if (!timestamp_col %in% names(dat)) {
+    stop("No `", timestamp_col, "` column found. Columns present: ",
+         paste(names(dat), collapse = ", "),
+         "\nUse timestamp_col = to point at the right one.", call. = FALSE)
+  }
+  if (timestamp_col != "timestamp") {
+    names(dat)[names(dat) == timestamp_col] <- "timestamp"
   }
 
   dat$timestamp <- parse_timestamp(dat$timestamp, tz = tz)

@@ -4,7 +4,7 @@
 \alias{read_ema}
 \title{Read EMA records into a tidy data frame}
 \usage{
-read_ema(path, start_date = NULL, tz = "UTC")
+read_ema(path, start_date = NULL, tz = "UTC", timestamp_col = "timestamp")
 }
 \arguments{
 \item{path}{Path to a \code{.csv} or \code{.json} file.}
@@ -14,6 +14,10 @@ began. Used to compute \code{study_day} when the file does not already have it.}
 
 \item{tz}{Time zone to interpret timestamps in. Defaults to \code{"UTC"}, which
 matches the ISO 8601 output of the companion app.}
+
+\item{timestamp_col}{Name of the column holding the timestamp. Real files
+call it many things (\code{datetime}, \code{time}, \code{recorded_at}); give the name here
+and it is renamed to \code{timestamp} on the way in.}
 }
 \value{
 A data frame with \code{timestamp} as \code{POSIXct}, \code{study_day} as integer
