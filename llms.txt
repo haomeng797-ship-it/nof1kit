@@ -3,25 +3,17 @@
 Design, monitor, and analyze single-case (N-of-1) intensive longitudinal
 studies in R.
 
-## The problem
+Single-case (N-of-1) designs ask whether a treatment works for *this*
+person. R is well stocked for analyzing that kind of data (`scan`,
+`SingleCaseES`), but everything before the analysis is usually a pile of
+one-off scripts: shuffle the conditions until the sequence looks right,
+keep the day-to-assignment map in a spreadsheet, eyeball a compliance
+number at the end. Mistakes made there don’t crash anything. They sit
+quietly in the data and wait for a reviewer to find them.
 
-Single-case designs answer a question group studies cannot: does this
-work for *this* person. R already has good tools for analyzing
-single-case data, notably `scan` and `SingleCaseES`. What is missing is
-everything before the analysis.
-
-A researcher running an N-of-1 study has to generate a randomization
-schedule that satisfies the design’s constraints, get it onto whatever
-device collects the data, check what comes back, and judge whether
-enough of the scheduled prompts were actually answered to support a
-conclusion. In practice each step is done by hand, per study, and the
-resulting errors are the kind that survive to publication because
-nothing checks for them: a day index that has drifted out of step with
-the calendar, a compliance rate that counts one prompt answered three
-times as three answered prompts, a schedule whose slow alternation lets
-a drifting mood series masquerade as a treatment effect.
-
-`nof1kit` covers that gap.
+nof1kit covers that stretch. It draws the randomization schedule, tells
+you what the design can actually detect, hands the schedule to the
+phone, and checks what comes back.
 
 ## What it does
 
@@ -42,41 +34,51 @@ compliance(ema, start_date = "2026-02-18", n_days = 70,
            times = c("09:00", "15:00", "21:00"))
 ```
 
-Three choices are worth stating up front, because each is a position
-rather than an implementation detail.
+A few things it does differently, and why:
 
-**Schedules are drawn uniformly over the constrained set.** Sampling is
-exact, by dynamic programming, not by rejection or blocking. For a
-balanced 70-day design with `max_run = 2`, fewer than one permutation in
-a million satisfies the constraint, so drawing until one fits is not
-viable. Blocked randomization is viable but restricts the sample space
-in ways that are rarely stated. Here every admissible sequence is
-equally likely, which is what a preregistration claiming “randomized”
-should mean.
-
-**Compliance counts prompts, not records.** A prompt answered three
-times counts once. A record arriving outside every response window is
-kept as data but is not evidence that a prompt was answered when it was
-asked. The two definitions differ by about three points on the study
-bundled with this package.
-
-**Power depends on the schedule, not only on its length.**
-[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
-analyses each simulated study both with and without an AR(1) error
-structure, because the cost of ignoring dependence has no fixed sign.
-Under the alternating schedules
+**The randomization is exactly what your preregistration says it is.**
+Sequences with balanced counts and short runs are surprisingly hard to
+draw fairly: in a balanced 70-day design with `max_run = 2`, fewer than
+one shuffle in a million qualifies, so redrawing until one fits would
+take forever, and settling for alternating blocks quietly changes the
+design without anyone deciding to.
 [`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
-produces, ignoring it is conservative: power is lost, but false
-positives are not created. Under a design that runs control for the
-first half and treatment for the second, at `phi = 0.7`, ordinary least
-squares rejects a true null about 40% of the time at a nominal 5% level.
+instead counts the valid ways forward from every partial sequence and
+samples in proportion, so every admissible schedule has exactly the same
+chance of being yours. Put the seed in the preregistration and anyone
+can regenerate it.
+
+**Compliance is counted the way you’d want to defend it to a reviewer.**
+If a prompt got answered three times, that’s one answered prompt, and if
+an entry shows up at midnight for a 3 p.m. prompt, it’s still data, it
+just isn’t an on-time answer.
+[`compliance()`](https://haomeng797-ship-it.github.io/nof1kit/reference/compliance.md)
+counts the scheduled prompts that were answered inside their window and
+reports everything else separately, so nothing is thrown away and
+nothing is double-counted. On the study that ships with the package,
+this reading and the usual records-divided-by-prompts one come out about
+three points apart. Neither is wrong; they answer different questions,
+and it helps to know which one you’re reporting.
+
+**[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
+tells you when a design would fool you.** Daily measurements from one
+person are autocorrelated, and what that does to your inference depends
+on the schedule. Each simulated study is analysed twice, with and
+without an AR(1) error structure, so you can see the gap for your own
+design before committing to it. With the alternating schedules
+[`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
+produces, ignoring the dependence just costs you some power. With a
+design that runs control for the first half and treatment for the
+second, it costs you the conclusion: at `phi = 0.7`, plain OLS calls a
+nonexistent effect significant roughly 40% of the time.
 
 ## Scope
 
-The package stops at the boundary of analysis. Intensive longitudinal
-data are well served by `lme4`, `nlme`, and `brms`, and duplicating them
-would serve nobody. What the ecosystem lacks is upstream of analysis,
-and that is what this fills.
+nof1kit stays out of the analysis itself. Once the data are read,
+checked, and the compliance is known, `lme4`, `nlme`, and `brms` already
+do that job better than a reimplementation here ever would. The missing
+piece was getting to that point cleanly, and that is the piece this
+package tries to be.
 
 ## Installation
 
