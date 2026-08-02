@@ -5,26 +5,29 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/nof1kit)](https://CRAN.R-project.org/package=nof1kit)
 <!-- badges: end -->
 
-Design, monitor, and analyze single-case (N-of-1) intensive longitudinal studies
-in R.
+Single-case (N-of-1) designs ask whether a treatment works for *this* person,
+rather than for the average of two hundred people who are not them.
 
-## The problem
+Running one is a slow commitment. You randomize a condition across days, answer
+a few prompts every day for two or three months, and only at the end find out
+whether the design could have detected anything at all. Almost none of that is
+tooled. The schedule gets shuffled in a script until it looks acceptable, the
+day-to-condition map lives in a spreadsheet, compliance is a number someone
+works out afterwards.
 
-Single-case designs answer a question group studies cannot: does this work for
-*this* person. R already has good tools for analyzing single-case data, notably
-`scan` and `SingleCaseES`. What is missing is everything before the analysis.
+Mistakes made in those steps don't throw errors. They sit in the data and wait.
 
-A researcher running an N-of-1 study has to generate a randomization schedule
-that satisfies the design's constraints, get it onto whatever device collects the
-data, check what comes back, and judge whether enough of the scheduled prompts
-were actually answered to support a conclusion. In practice each step is done by
-hand, per study, and the resulting errors are the kind that survive to
-publication because nothing checks for them: a day index that has drifted out of
-step with the calendar, a compliance rate that counts one prompt answered three
-times as three answered prompts, a schedule whose slow alternation lets a
-drifting mood series masquerade as a treatment effect.
+While writing this package's vignette, `validate_ema()` turned up an
+inconsistency in my own 70-day dataset that I had never noticed: one study day
+covering two calendar dates, quietly shifting the index for the last month of the study. Every routine
+check had passed. The values were in range, no timestamps were duplicated,
+nothing was missing, and every day number sat inside 1 to 70. The only way to
+see it was to hold the index up against the timestamps, which nothing had ever
+done.
 
-`nof1kit` covers that gap.
+nof1kit is the tooling for the part of a single-case study that comes before the
+analysis: drawing the schedule, working out what the design can detect, handing
+it to whatever collects the data, and checking what comes back.
 
 ## What it does
 
@@ -44,36 +47,63 @@ compliance(ema, start_date = "2026-02-18", n_days = 70,
            times = c("09:00", "15:00", "21:00"))
 ```
 
-Three choices are worth stating up front, because each is a position rather than
-an implementation detail.
+#### Before you spend three months on it
 
-**Schedules are drawn uniformly over the constrained set.** Sampling is exact, by
-dynamic programming, not by rejection or blocking. For a balanced 70-day design
-with `max_run = 2`, fewer than one permutation in a million satisfies the
-constraint, so drawing until one fits is not viable. Blocked randomization is
-viable but restricts the sample space in ways that are rarely stated. Here every
-admissible sequence is equally likely, which is what a preregistration claiming
-"randomized" should mean.
+An N-of-1 study is a two- or three-month commitment, so two things are worth
+settling before day one.
 
-**Compliance counts prompts, not records.** A prompt answered three times counts
-once. A record arriving outside every response window is kept as data but is not
-evidence that a prompt was answered when it was asked. The two definitions differ
-by about three points on the study bundled with this package.
+Is the randomization actually random? Balanced sequences with short runs are
+rarer than they look: in a 70-day design with `max_run = 2`, fewer than one
+shuffle in a million qualifies. Most scripts deal with this by redrawing until
+something fits, or by alternating blocks. Either way the sampling distribution
+changes, usually without being reported. `design_schedule()` samples the constrained set exactly, so every
+admissible schedule is equally likely, and the seed in your preregistration is
+enough to bring the whole thing back.
 
-**Power depends on the schedule, not only on its length.** `sim_power()` analyses
-each simulated study both with and without an AR(1) error structure, because the
-cost of ignoring dependence has no fixed sign. Under the alternating schedules
-`design_schedule()` produces, ignoring it is conservative: power is lost, but
-false positives are not created. Under a design that runs control for the first
-half and treatment for the second, at `phi = 0.7`, ordinary least squares rejects
-a true null about 40% of the time at a nominal 5% level.
+And can the study detect anything? `sim_power()` simulates it both ways, with
+and without the day-to-day correlation that daily measures always have. How much
+that correlation costs you depends on the schedule. An alternating one costs a
+little power; a first-half, second-half design can hand you a result that isn't
+there. At a lag-1 correlation of 0.7, plain OLS flags a nonexistent effect about
+40% of the time.
+
+#### While it runs
+
+`write_schedule()` writes the schedule as plain JSON, and the companion phone
+tools read that file directly. The instrument that collects the data never
+touches the randomization, which is one less way to unblind a study by
+accident.
+
+The other thing you find out while it runs is whether the prompts are actually
+being answered, and that turns out to depend on what you count. A prompt
+answered three times is still one answered prompt, and an entry that arrives at
+midnight for a 3 p.m. prompt is data, but not an on-time answer. `compliance()`
+counts prompts answered inside their window and keeps the rest visible off to
+the side. On the study bundled with the package, this number and the usual
+records-divided-by-prompts number sit about three points apart. Neither is
+wrong. It just helps to know which one you're reporting.
+
+#### When the data come back
+
+`read_ema()` reads whatever the phone exported and returns a data frame with
+real timestamps and a study-day index. `validate_ema()` then goes looking for
+the quiet problems: values out of range, repeated timestamps, missing fields,
+and a day index that no longer matches the calendar.
+
+That last check is the one that caught the problem in my own data, and it caught
+it months after the fact. Run while the study is still going, the same check
+flags the problem on the day it appears, while it is still a five-minute fix
+rather than a month of mislabelled records.
 
 ## Scope
 
-The package stops at the boundary of analysis. Intensive longitudinal data are
-well served by `lme4`, `nlme`, and `brms`, and duplicating them would serve
-nobody. What the ecosystem lacks is upstream of analysis, and that is what this
-fills.
+The package is small on purpose. It covers the steps that are easy to get almost
+right, where nothing breaks at the time and the cost turns up months later.
+
+nof1kit stays out of the analysis itself. Once the data are read, checked, and
+the compliance is known, `lme4`, `nlme`, and `brms` already do that job better
+than a reimplementation here ever would. The missing piece was getting to that
+point cleanly, and that is the piece this package tries to be.
 
 ## Installation
 
