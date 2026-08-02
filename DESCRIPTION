@@ -14,6 +14,9 @@ Description: Tools for the full lifecycle of a single-case (N-of-1)
     review), a 70-day randomized N-of-1 study collected with stock iOS
     tools at 92.9% compliance.
 License: MIT + file LICENSE
+URL: https://github.com/haomeng797-ship-it/nof1kit,
+    https://haomeng797-ship-it.github.io/nof1kit/
+BugReports: https://github.com/haomeng797-ship-it/nof1kit/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports:
