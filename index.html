@@ -52,11 +52,11 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Design, monitor, and analyze single-case (N-of-1) intensive longitudinal studies in R.</p>
-<p>Single-case (N-of-1) designs ask whether a treatment works for <em>this</em> person.</p>
-<p>R is well stocked for analyzing that kind of data (<code>scan</code>, <code>SingleCaseES</code>). Everything before the analysis is usually a pile of one-off scripts: shuffle the conditions until the sequence looks right, keep the day-to-assignment map in a spreadsheet, eyeball a compliance number at the end.</p>
-<p>Mistakes made there don’t crash anything. They sit in the data and wait for a reviewer to find them.</p>
-<p>nof1kit covers that stretch. It draws the schedule, tells you what the design can actually detect, hands it to the phone, and checks what comes back.</p>
+<p>Single-case (N-of-1) designs ask whether a treatment works for <em>this</em> person, rather than for the average of two hundred people who are not them.</p>
+<p>Running one is a slow commitment. You randomize a condition across days, answer a few prompts every day for two or three months, and only at the end find out whether the design could have detected anything at all. Almost none of that is tooled. The schedule gets shuffled in a script until it looks acceptable, the day-to-condition map lives in a spreadsheet, compliance is a number someone works out afterwards.</p>
+<p>Mistakes made in those steps don’t throw errors. They sit in the data and wait.</p>
+<p>While writing this package’s vignette, <code><a href="reference/validate_ema.html">validate_ema()</a></code> turned up a defect in my own 70-day dataset that I had never noticed: one study day covering two calendar dates, quietly shifting the index for the last month of the study. Every routine check had passed. The values were in range, no timestamps were duplicated, nothing was missing, and every day number sat inside 1 to 70. The only way to see it was to hold the index up against the timestamps, which nothing had ever done.</p>
+<p>nof1kit is the tooling for the part of a single-case study that comes before the analysis: drawing the schedule, working out what the design can detect, handing it to whatever collects the data, and checking what comes back.</p>
 <div class="section level2">
 <h2 id="what-it-does">What it does<a class="anchor" aria-label="anchor" href="#what-it-does"></a>
 </h2>
@@ -74,22 +74,24 @@
 <span><span class="fu"><a href="reference/validate_ema.html">validate_ema</a></span><span class="op">(</span><span class="va">ema</span>, ranges <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>mood <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>, n_days <span class="op">=</span> <span class="fl">70</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/compliance.html">compliance</a></span><span class="op">(</span><span class="va">ema</span>, start_date <span class="op">=</span> <span class="st">"2026-02-18"</span>, n_days <span class="op">=</span> <span class="fl">70</span>,</span>
 <span>           times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"09:00"</span>, <span class="st">"15:00"</span>, <span class="st">"21:00"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>A few things it does differently, and why:</p>
 <div class="section level4">
-<h4 id="the-randomization-is-exactly-what-your-preregistration-says-it-is">The randomization is exactly what your preregistration says it is<a class="anchor" aria-label="anchor" href="#the-randomization-is-exactly-what-your-preregistration-says-it-is"></a>
+<h4 id="before-you-spend-three-months-on-it">Before you spend three months on it<a class="anchor" aria-label="anchor" href="#before-you-spend-three-months-on-it"></a>
 </h4>
-<p>Balanced counts with short runs turn out to be hard to draw fairly. In a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies, so people redraw until something fits or settle for alternating blocks, and both quietly change the design without anyone deciding to. <code><a href="reference/design_schedule.html">design_schedule()</a></code> counts the valid ways forward from each partial sequence and samples in proportion, so every admissible schedule has the same chance of being yours. Put the seed in the preregistration and anyone can bring it back.</p>
+<p>An N-of-1 study is a two- or three-month commitment, so two things are worth settling before day one.</p>
+<p>Is the randomization actually random? Balanced sequences with short runs are rarer than they look: in a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies. Most scripts deal with this by redrawing until something fits, or by alternating blocks. Both change the design, just without saying so. <code><a href="reference/design_schedule.html">design_schedule()</a></code> samples the constrained set exactly, so every admissible schedule is equally likely, and the seed in your preregistration is enough to bring the whole thing back.</p>
+<p>And can the study detect anything? <code><a href="reference/sim_power.html">sim_power()</a></code> simulates it both ways, with and without the day-to-day correlation that daily measures always have. The answer depends on the schedule more than people expect. An alternating schedule loses a little power when you ignore the correlation. A first-half, second-half design loses the conclusion itself: at a lag-1 correlation of 0.7, plain OLS flags a nonexistent effect about 40% of the time.</p>
 </div>
 <div class="section level4">
-<h4 id="compliance-counted-the-way-youd-defend-it-to-a-reviewer">Compliance, counted the way you’d defend it to a reviewer<a class="anchor" aria-label="anchor" href="#compliance-counted-the-way-youd-defend-it-to-a-reviewer"></a>
+<h4 id="while-it-runs">While it runs<a class="anchor" aria-label="anchor" href="#while-it-runs"></a>
 </h4>
-<p>A prompt answered three times is one answered prompt, and an entry that shows up at midnight for a 3 p.m. prompt is data but not an on-time answer. <code><a href="reference/compliance.html">compliance()</a></code> counts the prompts answered inside their window and reports the rest separately, so nothing is thrown away and nothing is counted twice. On the study bundled here, that reading and the usual records-over-prompts one land about three points apart. Neither is wrong; they answer different questions, and it helps to know which one you are reporting.</p>
+<p><code><a href="reference/write_schedule.html">write_schedule()</a></code> writes the schedule as plain JSON, and the companion phone tools read that file directly. The instrument that collects the data never touches the randomization, which is one less way to unblind a study by accident.</p>
+<p>The other thing you find out while it runs is whether the prompts are actually being answered, and that turns out to depend on what you count. A prompt answered three times is still one answered prompt, and an entry that arrives at midnight for a 3 p.m. prompt is data, but not an on-time answer. <code><a href="reference/compliance.html">compliance()</a></code> counts prompts answered inside their window and keeps the rest visible off to the side. On the study bundled with the package, this number and the usual records-divided-by-prompts number sit about three points apart. Neither is wrong. It just helps to know which one you’re reporting.</p>
 </div>
 <div class="section level4">
-<h4 id="sim_power-tells-you-when-a-design-would-fool-you">
-<code>sim_power()</code> tells you when a design would fool you<a class="anchor" aria-label="anchor" href="#sim_power-tells-you-when-a-design-would-fool-you"></a>
+<h4 id="when-the-data-come-back">When the data come back<a class="anchor" aria-label="anchor" href="#when-the-data-come-back"></a>
 </h4>
-<p>Daily measurements from one person are autocorrelated, and what that does to your inference depends on the schedule you picked. Each simulated study is analysed twice, with and without an AR(1) error structure, so you can see the gap before committing to anything. With the alternating schedules <code><a href="reference/design_schedule.html">design_schedule()</a></code> produces, ignoring the dependence costs you some power; with a design that runs control for the first half and treatment for the second, it costs you the conclusion. At <code>phi = 0.7</code>, plain OLS calls a nonexistent effect significant about 40% of the time.</p>
+<p><code><a href="reference/read_ema.html">read_ema()</a></code> reads whatever the phone exported and returns a data frame with real timestamps and a study-day index. <code><a href="reference/validate_ema.html">validate_ema()</a></code> then goes looking for the quiet problems: values out of range, repeated timestamps, missing fields, and a day index that no longer matches the calendar.</p>
+<p>That last check is the one that caught the defect in my own data, and it caught it months after the fact. Run while the study is still going, the same check flags the problem on the day it appears, while it is still a five-minute fix rather than a month of mislabelled records.</p>
 </div>
 </div>
 <div class="section level2">

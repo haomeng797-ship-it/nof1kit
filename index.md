@@ -1,23 +1,33 @@
 # nof1kit
 
-Design, monitor, and analyze single-case (N-of-1) intensive longitudinal
-studies in R.
-
 Single-case (N-of-1) designs ask whether a treatment works for *this*
-person.
+person, rather than for the average of two hundred people who are not
+them.
 
-R is well stocked for analyzing that kind of data (`scan`,
-`SingleCaseES`). Everything before the analysis is usually a pile of
-one-off scripts: shuffle the conditions until the sequence looks right,
-keep the day-to-assignment map in a spreadsheet, eyeball a compliance
-number at the end.
+Running one is a slow commitment. You randomize a condition across days,
+answer a few prompts every day for two or three months, and only at the
+end find out whether the design could have detected anything at all.
+Almost none of that is tooled. The schedule gets shuffled in a script
+until it looks acceptable, the day-to-condition map lives in a
+spreadsheet, compliance is a number someone works out afterwards.
 
-Mistakes made there don’t crash anything. They sit in the data and wait
-for a reviewer to find them.
+Mistakes made in those steps don’t throw errors. They sit in the data
+and wait.
 
-nof1kit covers that stretch. It draws the schedule, tells you what the
-design can actually detect, hands it to the phone, and checks what comes
-back.
+While writing this package’s vignette,
+[`validate_ema()`](https://haomeng797-ship-it.github.io/nof1kit/reference/validate_ema.md)
+turned up a defect in my own 70-day dataset that I had never noticed:
+one study day covering two calendar dates, quietly shifting the index
+for the last month of the study. Every routine check had passed. The
+values were in range, no timestamps were duplicated, nothing was
+missing, and every day number sat inside 1 to 70. The only way to see it
+was to hold the index up against the timestamps, which nothing had ever
+done.
+
+nof1kit is the tooling for the part of a single-case study that comes
+before the analysis: drawing the schedule, working out what the design
+can detect, handing it to whatever collects the data, and checking what
+comes back.
 
 ## What it does
 
@@ -38,44 +48,63 @@ compliance(ema, start_date = "2026-02-18", n_days = 70,
            times = c("09:00", "15:00", "21:00"))
 ```
 
-A few things it does differently, and why:
+#### Before you spend three months on it
 
-#### The randomization is exactly what your preregistration says it is
+An N-of-1 study is a two- or three-month commitment, so two things are
+worth settling before day one.
 
-Balanced counts with short runs turn out to be hard to draw fairly. In a
-70-day design with `max_run = 2`, fewer than one shuffle in a million
-qualifies, so people redraw until something fits or settle for
-alternating blocks, and both quietly change the design without anyone
-deciding to.
+Is the randomization actually random? Balanced sequences with short runs
+are rarer than they look: in a 70-day design with `max_run = 2`, fewer
+than one shuffle in a million qualifies. Most scripts deal with this by
+redrawing until something fits, or by alternating blocks. Both change
+the design, just without saying so.
 [`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
-counts the valid ways forward from each partial sequence and samples in
-proportion, so every admissible schedule has the same chance of being
-yours. Put the seed in the preregistration and anyone can bring it back.
+samples the constrained set exactly, so every admissible schedule is
+equally likely, and the seed in your preregistration is enough to bring
+the whole thing back.
 
-#### Compliance, counted the way you’d defend it to a reviewer
+And can the study detect anything?
+[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
+simulates it both ways, with and without the day-to-day correlation that
+daily measures always have. The answer depends on the schedule more than
+people expect. An alternating schedule loses a little power when you
+ignore the correlation. A first-half, second-half design loses the
+conclusion itself: at a lag-1 correlation of 0.7, plain OLS flags a
+nonexistent effect about 40% of the time.
 
-A prompt answered three times is one answered prompt, and an entry that
-shows up at midnight for a 3 p.m. prompt is data but not an on-time
+#### While it runs
+
+[`write_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/write_schedule.md)
+writes the schedule as plain JSON, and the companion phone tools read
+that file directly. The instrument that collects the data never touches
+the randomization, which is one less way to unblind a study by accident.
+
+The other thing you find out while it runs is whether the prompts are
+actually being answered, and that turns out to depend on what you count.
+A prompt answered three times is still one answered prompt, and an entry
+that arrives at midnight for a 3 p.m. prompt is data, but not an on-time
 answer.
 [`compliance()`](https://haomeng797-ship-it.github.io/nof1kit/reference/compliance.md)
-counts the prompts answered inside their window and reports the rest
-separately, so nothing is thrown away and nothing is counted twice. On
-the study bundled here, that reading and the usual records-over-prompts
-one land about three points apart. Neither is wrong; they answer
-different questions, and it helps to know which one you are reporting.
+counts prompts answered inside their window and keeps the rest visible
+off to the side. On the study bundled with the package, this number and
+the usual records-divided-by-prompts number sit about three points
+apart. Neither is wrong. It just helps to know which one you’re
+reporting.
 
-#### `sim_power()` tells you when a design would fool you
+#### When the data come back
 
-Daily measurements from one person are autocorrelated, and what that
-does to your inference depends on the schedule you picked. Each
-simulated study is analysed twice, with and without an AR(1) error
-structure, so you can see the gap before committing to anything. With
-the alternating schedules
-[`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
-produces, ignoring the dependence costs you some power; with a design
-that runs control for the first half and treatment for the second, it
-costs you the conclusion. At `phi = 0.7`, plain OLS calls a nonexistent
-effect significant about 40% of the time.
+[`read_ema()`](https://haomeng797-ship-it.github.io/nof1kit/reference/read_ema.md)
+reads whatever the phone exported and returns a data frame with real
+timestamps and a study-day index.
+[`validate_ema()`](https://haomeng797-ship-it.github.io/nof1kit/reference/validate_ema.md)
+then goes looking for the quiet problems: values out of range, repeated
+timestamps, missing fields, and a day index that no longer matches the
+calendar.
+
+That last check is the one that caught the defect in my own data, and it
+caught it months after the fact. Run while the study is still going, the
+same check flags the problem on the day it appears, while it is still a
+five-minute fix rather than a month of mislabelled records.
 
 ## Scope
 
