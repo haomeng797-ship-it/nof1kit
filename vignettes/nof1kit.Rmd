@@ -81,13 +81,15 @@ path <- system.file("extdata", "melatonin_ema.csv", package = "nof1kit")
 ema <- read_ema(path, start_date = "2026-02-18", timestamp_col = "datetime")
 ```
 
-That error is not a demonstration. It is a real defect in a real dataset, found by
-writing this vignette.
+The file carries its own `study_day` column, and it does not match the calendar:
+collection ran across 71 calendar days while the preregistered protocol covered
+70, so one study day spans two dates. The analysis was preregistered over 70 days
+and indexed by `study_day`, which is the correct scope, but a file whose index and
+calendar disagree is worth surfacing rather than silently accepting.
 
-The file carries its own `study_day` column, and for 68 of 195 records that column
-disagrees with the calendar. Reading with a `start_date` makes the two indices
-meet, so the conflict surfaces immediately. Reading without one accepts the file's
-index, and `validate_ema()` catches it instead:
+Passing `start_date` makes the two indices meet, so the discrepancy is raised at
+read time. Omitting it accepts the file's index, and `validate_ema()` reports it
+instead:
 
 ```{r}
 ema <- read_ema(path, timestamp_col = "datetime")
@@ -102,11 +104,15 @@ v
 subset(v$issues, check == "inconsistent_study_day")
 ```
 
-One study day covering two calendar dates shifts every record after it. Here the
-shift runs for the final 27 days of the study, and it is invisible to the checks
-most pipelines actually perform: the values are all in range, no timestamps are
-duplicated, nothing is missing, and every `study_day` sits inside `1:70`. Only
-comparing the index against the calendar reveals it.
+The point of the check is that this is invisible to everything else a pipeline
+usually does: the values are all in range, no timestamps are duplicated, nothing
+is missing, and every `study_day` sits inside `1:70`. An index that has drifted
+from the calendar is only visible if something compares the two.
+
+Whether the drift matters depends on the design. Here it does not, because the
+analysis was preregistered over 70 study days and indexed by `study_day`
+throughout. In a study indexed by date, or one where the two were assumed
+interchangeable, the same drift would silently misalign a third of the records.
 
 The result is data, not a printed report, so a pipeline that must not proceed on
 bad input can act on it:
