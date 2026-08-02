@@ -53,8 +53,10 @@
 <!-- badges: start -->
 
 <p>Design, monitor, and analyze single-case (N-of-1) intensive longitudinal studies in R.</p>
-<p>Single-case (N-of-1) designs ask whether a treatment works for <em>this</em> person. R is well stocked for analyzing that kind of data (<code>scan</code>, <code>SingleCaseES</code>), but everything before the analysis is usually a pile of one-off scripts: shuffle the conditions until the sequence looks right, keep the day-to-assignment map in a spreadsheet, eyeball a compliance number at the end. Mistakes made there don’t crash anything. They sit quietly in the data and wait for a reviewer to find them.</p>
-<p>nof1kit covers that stretch. It draws the randomization schedule, tells you what the design can actually detect, hands the schedule to the phone, and checks what comes back.</p>
+<p>Single-case (N-of-1) designs ask whether a treatment works for <em>this</em> person.</p>
+<p>R is well stocked for analyzing that kind of data (<code>scan</code>, <code>SingleCaseES</code>). Everything before the analysis is usually a pile of one-off scripts: shuffle the conditions until the sequence looks right, keep the day-to-assignment map in a spreadsheet, eyeball a compliance number at the end.</p>
+<p>Mistakes made there don’t crash anything. They sit in the data and wait for a reviewer to find them.</p>
+<p>nof1kit covers that stretch. It draws the schedule, tells you what the design can actually detect, hands it to the phone, and checks what comes back.</p>
 <div class="section level2">
 <h2 id="what-it-does">What it does<a class="anchor" aria-label="anchor" href="#what-it-does"></a>
 </h2>
@@ -73,9 +75,19 @@
 <span><span class="fu"><a href="reference/compliance.html">compliance</a></span><span class="op">(</span><span class="va">ema</span>, start_date <span class="op">=</span> <span class="st">"2026-02-18"</span>, n_days <span class="op">=</span> <span class="fl">70</span>,</span>
 <span>           times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"09:00"</span>, <span class="st">"15:00"</span>, <span class="st">"21:00"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>A few things it does differently, and why:</p>
-<p><strong>The randomization is exactly what your preregistration says it is.</strong> Sequences with balanced counts and short runs are surprisingly hard to draw fairly: in a balanced 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies, so redrawing until one fits would take forever, and settling for alternating blocks quietly changes the design without anyone deciding to. <code><a href="reference/design_schedule.html">design_schedule()</a></code> instead counts the valid ways forward from every partial sequence and samples in proportion, so every admissible schedule has exactly the same chance of being yours. Put the seed in the preregistration and anyone can regenerate it.</p>
-<p><strong>Compliance is counted the way you’d want to defend it to a reviewer.</strong> If a prompt got answered three times, that’s one answered prompt, and if an entry shows up at midnight for a 3 p.m. prompt, it’s still data, it just isn’t an on-time answer. <code><a href="reference/compliance.html">compliance()</a></code> counts the scheduled prompts that were answered inside their window and reports everything else separately, so nothing is thrown away and nothing is double-counted. On the study that ships with the package, this reading and the usual records-divided-by-prompts one come out about three points apart. Neither is wrong; they answer different questions, and it helps to know which one you’re reporting.</p>
-<p><strong><code><a href="reference/sim_power.html">sim_power()</a></code> tells you when a design would fool you.</strong> Daily measurements from one person are autocorrelated, and what that does to your inference depends on the schedule. Each simulated study is analysed twice, with and without an AR(1) error structure, so you can see the gap for your own design before committing to it. With the alternating schedules <code><a href="reference/design_schedule.html">design_schedule()</a></code> produces, ignoring the dependence just costs you some power. With a design that runs control for the first half and treatment for the second, it costs you the conclusion: at <code>phi = 0.7</code>, plain OLS calls a nonexistent effect significant roughly 40% of the time.</p>
+<p><strong>The randomization is exactly what your preregistration says it is.</strong></p>
+<p>Balanced counts with short runs turn out to be hard to draw fairly. In a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies.</p>
+<p>So people redraw until something fits, or fall back on alternating blocks. Both quietly change the design.</p>
+<p><code><a href="reference/design_schedule.html">design_schedule()</a></code> counts the valid ways forward from each partial sequence and samples in proportion. Every admissible schedule has the same chance of being yours, and the seed brings it back.</p>
+<p><strong>Compliance, counted the way you’d defend it to a reviewer.</strong></p>
+<p>A prompt answered three times is one answered prompt. An entry that arrives at midnight for a 3 p.m. prompt is data, but it isn’t an on-time answer.</p>
+<p><code><a href="reference/compliance.html">compliance()</a></code> counts the prompts answered inside their window and reports the rest separately. Nothing thrown away, nothing counted twice.</p>
+<p>On the study bundled here, that reading and the usual records-over-prompts one land about three points apart. Neither is wrong. They answer different questions, and it helps to know which one you are reporting.</p>
+<p><strong><code><a href="reference/sim_power.html">sim_power()</a></code> tells you when a design would fool you.</strong></p>
+<p>Daily measurements from one person are autocorrelated. What that does to your inference depends on the schedule you picked.</p>
+<p>Each simulated study is analysed twice, with and without an AR(1) error structure, so you can see the gap before committing to a design.</p>
+<p>With the alternating schedules <code><a href="reference/design_schedule.html">design_schedule()</a></code> produces, ignoring the dependence costs you some power. With a design that runs control for the first half and treatment for the second, it costs you the conclusion.</p>
+<p>At <code>phi = 0.7</code>, plain OLS calls a nonexistent effect significant about 40% of the time.</p>
 </div>
 <div class="section level2">
 <h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>

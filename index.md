@@ -4,16 +4,20 @@ Design, monitor, and analyze single-case (N-of-1) intensive longitudinal
 studies in R.
 
 Single-case (N-of-1) designs ask whether a treatment works for *this*
-person. R is well stocked for analyzing that kind of data (`scan`,
-`SingleCaseES`), but everything before the analysis is usually a pile of
+person.
+
+R is well stocked for analyzing that kind of data (`scan`,
+`SingleCaseES`). Everything before the analysis is usually a pile of
 one-off scripts: shuffle the conditions until the sequence looks right,
 keep the day-to-assignment map in a spreadsheet, eyeball a compliance
-number at the end. Mistakes made there don’t crash anything. They sit
-quietly in the data and wait for a reviewer to find them.
+number at the end.
 
-nof1kit covers that stretch. It draws the randomization schedule, tells
-you what the design can actually detect, hands the schedule to the
-phone, and checks what comes back.
+Mistakes made there don’t crash anything. They sit in the data and wait
+for a reviewer to find them.
+
+nof1kit covers that stretch. It draws the schedule, tells you what the
+design can actually detect, hands it to the phone, and checks what comes
+back.
 
 ## What it does
 
@@ -37,40 +41,51 @@ compliance(ema, start_date = "2026-02-18", n_days = 70,
 A few things it does differently, and why:
 
 **The randomization is exactly what your preregistration says it is.**
-Sequences with balanced counts and short runs are surprisingly hard to
-draw fairly: in a balanced 70-day design with `max_run = 2`, fewer than
-one shuffle in a million qualifies, so redrawing until one fits would
-take forever, and settling for alternating blocks quietly changes the
-design without anyone deciding to.
-[`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
-instead counts the valid ways forward from every partial sequence and
-samples in proportion, so every admissible schedule has exactly the same
-chance of being yours. Put the seed in the preregistration and anyone
-can regenerate it.
 
-**Compliance is counted the way you’d want to defend it to a reviewer.**
-If a prompt got answered three times, that’s one answered prompt, and if
-an entry shows up at midnight for a 3 p.m. prompt, it’s still data, it
-just isn’t an on-time answer.
+Balanced counts with short runs turn out to be hard to draw fairly. In a
+70-day design with `max_run = 2`, fewer than one shuffle in a million
+qualifies.
+
+So people redraw until something fits, or fall back on alternating
+blocks. Both quietly change the design.
+
+[`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
+counts the valid ways forward from each partial sequence and samples in
+proportion. Every admissible schedule has the same chance of being
+yours, and the seed brings it back.
+
+**Compliance, counted the way you’d defend it to a reviewer.**
+
+A prompt answered three times is one answered prompt. An entry that
+arrives at midnight for a 3 p.m. prompt is data, but it isn’t an on-time
+answer.
+
 [`compliance()`](https://haomeng797-ship-it.github.io/nof1kit/reference/compliance.md)
-counts the scheduled prompts that were answered inside their window and
-reports everything else separately, so nothing is thrown away and
-nothing is double-counted. On the study that ships with the package,
-this reading and the usual records-divided-by-prompts one come out about
-three points apart. Neither is wrong; they answer different questions,
-and it helps to know which one you’re reporting.
+counts the prompts answered inside their window and reports the rest
+separately. Nothing thrown away, nothing counted twice.
+
+On the study bundled here, that reading and the usual
+records-over-prompts one land about three points apart. Neither is
+wrong. They answer different questions, and it helps to know which one
+you are reporting.
 
 **[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
-tells you when a design would fool you.** Daily measurements from one
-person are autocorrelated, and what that does to your inference depends
-on the schedule. Each simulated study is analysed twice, with and
-without an AR(1) error structure, so you can see the gap for your own
-design before committing to it. With the alternating schedules
+tells you when a design would fool you.**
+
+Daily measurements from one person are autocorrelated. What that does to
+your inference depends on the schedule you picked.
+
+Each simulated study is analysed twice, with and without an AR(1) error
+structure, so you can see the gap before committing to a design.
+
+With the alternating schedules
 [`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
-produces, ignoring the dependence just costs you some power. With a
-design that runs control for the first half and treatment for the
-second, it costs you the conclusion: at `phi = 0.7`, plain OLS calls a
-nonexistent effect significant roughly 40% of the time.
+produces, ignoring the dependence costs you some power. With a design
+that runs control for the first half and treatment for the second, it
+costs you the conclusion.
+
+At `phi = 0.7`, plain OLS calls a nonexistent effect significant about
+40% of the time.
 
 ## Scope
 
