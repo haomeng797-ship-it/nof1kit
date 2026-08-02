@@ -40,52 +40,42 @@ compliance(ema, start_date = "2026-02-18", n_days = 70,
 
 A few things it does differently, and why:
 
-**The randomization is exactly what your preregistration says it is.**
+#### The randomization is exactly what your preregistration says it is
 
 Balanced counts with short runs turn out to be hard to draw fairly. In a
 70-day design with `max_run = 2`, fewer than one shuffle in a million
-qualifies.
-
-So people redraw until something fits, or fall back on alternating
-blocks. Both quietly change the design.
-
+qualifies, so people redraw until something fits or settle for
+alternating blocks, and both quietly change the design without anyone
+deciding to.
 [`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
 counts the valid ways forward from each partial sequence and samples in
-proportion. Every admissible schedule has the same chance of being
-yours, and the seed brings it back.
+proportion, so every admissible schedule has the same chance of being
+yours. Put the seed in the preregistration and anyone can bring it back.
 
-**Compliance, counted the way you’d defend it to a reviewer.**
+#### Compliance, counted the way you’d defend it to a reviewer
 
-A prompt answered three times is one answered prompt. An entry that
-arrives at midnight for a 3 p.m. prompt is data, but it isn’t an on-time
+A prompt answered three times is one answered prompt, and an entry that
+shows up at midnight for a 3 p.m. prompt is data but not an on-time
 answer.
-
 [`compliance()`](https://haomeng797-ship-it.github.io/nof1kit/reference/compliance.md)
 counts the prompts answered inside their window and reports the rest
-separately. Nothing thrown away, nothing counted twice.
+separately, so nothing is thrown away and nothing is counted twice. On
+the study bundled here, that reading and the usual records-over-prompts
+one land about three points apart. Neither is wrong; they answer
+different questions, and it helps to know which one you are reporting.
 
-On the study bundled here, that reading and the usual
-records-over-prompts one land about three points apart. Neither is
-wrong. They answer different questions, and it helps to know which one
-you are reporting.
+#### `sim_power()` tells you when a design would fool you
 
-**[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
-tells you when a design would fool you.**
-
-Daily measurements from one person are autocorrelated. What that does to
-your inference depends on the schedule you picked.
-
-Each simulated study is analysed twice, with and without an AR(1) error
-structure, so you can see the gap before committing to a design.
-
-With the alternating schedules
+Daily measurements from one person are autocorrelated, and what that
+does to your inference depends on the schedule you picked. Each
+simulated study is analysed twice, with and without an AR(1) error
+structure, so you can see the gap before committing to anything. With
+the alternating schedules
 [`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
-produces, ignoring the dependence costs you some power. With a design
+produces, ignoring the dependence costs you some power; with a design
 that runs control for the first half and treatment for the second, it
-costs you the conclusion.
-
-At `phi = 0.7`, plain OLS calls a nonexistent effect significant about
-40% of the time.
+costs you the conclusion. At `phi = 0.7`, plain OLS calls a nonexistent
+effect significant about 40% of the time.
 
 ## Scope
 

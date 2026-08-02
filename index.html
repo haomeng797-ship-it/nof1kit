@@ -75,19 +75,22 @@
 <span><span class="fu"><a href="reference/compliance.html">compliance</a></span><span class="op">(</span><span class="va">ema</span>, start_date <span class="op">=</span> <span class="st">"2026-02-18"</span>, n_days <span class="op">=</span> <span class="fl">70</span>,</span>
 <span>           times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"09:00"</span>, <span class="st">"15:00"</span>, <span class="st">"21:00"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>A few things it does differently, and why:</p>
-<p><strong>The randomization is exactly what your preregistration says it is.</strong></p>
-<p>Balanced counts with short runs turn out to be hard to draw fairly. In a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies.</p>
-<p>So people redraw until something fits, or fall back on alternating blocks. Both quietly change the design.</p>
-<p><code><a href="reference/design_schedule.html">design_schedule()</a></code> counts the valid ways forward from each partial sequence and samples in proportion. Every admissible schedule has the same chance of being yours, and the seed brings it back.</p>
-<p><strong>Compliance, counted the way you’d defend it to a reviewer.</strong></p>
-<p>A prompt answered three times is one answered prompt. An entry that arrives at midnight for a 3 p.m. prompt is data, but it isn’t an on-time answer.</p>
-<p><code><a href="reference/compliance.html">compliance()</a></code> counts the prompts answered inside their window and reports the rest separately. Nothing thrown away, nothing counted twice.</p>
-<p>On the study bundled here, that reading and the usual records-over-prompts one land about three points apart. Neither is wrong. They answer different questions, and it helps to know which one you are reporting.</p>
-<p><strong><code><a href="reference/sim_power.html">sim_power()</a></code> tells you when a design would fool you.</strong></p>
-<p>Daily measurements from one person are autocorrelated. What that does to your inference depends on the schedule you picked.</p>
-<p>Each simulated study is analysed twice, with and without an AR(1) error structure, so you can see the gap before committing to a design.</p>
-<p>With the alternating schedules <code><a href="reference/design_schedule.html">design_schedule()</a></code> produces, ignoring the dependence costs you some power. With a design that runs control for the first half and treatment for the second, it costs you the conclusion.</p>
-<p>At <code>phi = 0.7</code>, plain OLS calls a nonexistent effect significant about 40% of the time.</p>
+<div class="section level4">
+<h4 id="the-randomization-is-exactly-what-your-preregistration-says-it-is">The randomization is exactly what your preregistration says it is<a class="anchor" aria-label="anchor" href="#the-randomization-is-exactly-what-your-preregistration-says-it-is"></a>
+</h4>
+<p>Balanced counts with short runs turn out to be hard to draw fairly. In a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies, so people redraw until something fits or settle for alternating blocks, and both quietly change the design without anyone deciding to. <code><a href="reference/design_schedule.html">design_schedule()</a></code> counts the valid ways forward from each partial sequence and samples in proportion, so every admissible schedule has the same chance of being yours. Put the seed in the preregistration and anyone can bring it back.</p>
+</div>
+<div class="section level4">
+<h4 id="compliance-counted-the-way-youd-defend-it-to-a-reviewer">Compliance, counted the way you’d defend it to a reviewer<a class="anchor" aria-label="anchor" href="#compliance-counted-the-way-youd-defend-it-to-a-reviewer"></a>
+</h4>
+<p>A prompt answered three times is one answered prompt, and an entry that shows up at midnight for a 3 p.m. prompt is data but not an on-time answer. <code><a href="reference/compliance.html">compliance()</a></code> counts the prompts answered inside their window and reports the rest separately, so nothing is thrown away and nothing is counted twice. On the study bundled here, that reading and the usual records-over-prompts one land about three points apart. Neither is wrong; they answer different questions, and it helps to know which one you are reporting.</p>
+</div>
+<div class="section level4">
+<h4 id="sim_power-tells-you-when-a-design-would-fool-you">
+<code>sim_power()</code> tells you when a design would fool you<a class="anchor" aria-label="anchor" href="#sim_power-tells-you-when-a-design-would-fool-you"></a>
+</h4>
+<p>Daily measurements from one person are autocorrelated, and what that does to your inference depends on the schedule you picked. Each simulated study is analysed twice, with and without an AR(1) error structure, so you can see the gap before committing to anything. With the alternating schedules <code><a href="reference/design_schedule.html">design_schedule()</a></code> produces, ignoring the dependence costs you some power; with a design that runs control for the first half and treatment for the second, it costs you the conclusion. At <code>phi = 0.7</code>, plain OLS calls a nonexistent effect significant about 40% of the time.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>
