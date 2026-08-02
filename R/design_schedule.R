@@ -51,9 +51,30 @@ design_schedule <- function(n_days,
     stop("`max_run` must be at least 1.", call. = FALSE)
   }
 
-  # Balanced target counts: differ by at most 1 when n_days is not a
-  # multiple of the number of conditions.
-  k <- length(conditions)
+  set.seed(seed)
+  idx <- sample_constrained(n_days, length(conditions), max_run)
+
+  out <- data.frame(day = seq_len(n_days), condition = conditions[idx])
+  attr(out, "conditions") <- conditions
+  attr(out, "max_run")    <- max_run
+  attr(out, "seed")       <- seed
+  class(out) <- c("nof1_schedule", class(out))
+  out
+}
+
+#' Draw one balanced, run-constrained sequence of condition indices
+#'
+#' Exact uniform sampling over the constrained set, by counting valid
+#' completions with dynamic programming and then sampling forward in
+#' proportion to those counts. Does not touch the seed, so it is safe to call
+#' inside a simulation loop.
+#'
+#' @param n_days Length of the sequence.
+#' @param k Number of conditions.
+#' @param max_run Maximum run of identical consecutive values.
+#' @return Integer vector of condition indices in `1:k`.
+#' @noRd
+sample_constrained <- function(n_days, k, max_run) {
   counts <- rep(n_days %/% k, k) + (seq_len(k) <= n_days %% k)
 
   # Dynamic programming: n_valid(counts, last, run) = number of valid ways
@@ -88,7 +109,6 @@ design_schedule <- function(n_days,
 
   # Forward sampling, each day proportional to the number of valid
   # completions after that choice.
-  set.seed(seed)
   seq_idx <- integer(n_days)
   cnt <- counts; last <- 0L; run <- 0L
   for (d in seq_len(n_days)) {
@@ -111,11 +131,5 @@ design_schedule <- function(n_days,
     cnt[j] <- cnt[j] - 1L
     seq_idx[d] <- j
   }
-
-  out <- data.frame(day = seq_len(n_days), condition = conditions[seq_idx])
-  attr(out, "conditions") <- conditions
-  attr(out, "max_run")    <- max_run
-  attr(out, "seed")       <- seed
-  class(out) <- c("nof1_schedule", class(out))
-  out
+  seq_idx
 }

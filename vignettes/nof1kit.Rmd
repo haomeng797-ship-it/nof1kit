@@ -15,14 +15,14 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(nof1kit)
 ```
 
-A single-case (N-of-1) experiment has four stages: design a randomization
-schedule, collect data against it, check what came back, and analyze it. Packages
-for single-case analysis are plentiful. The first three stages are usually
-hand-rolled, which is where the errors live.
+A single-case (N-of-1) experiment has a lifecycle: design a randomization
+schedule, work out what it can detect, collect data against it, check what came
+back, and analyze it. Packages for single-case analysis are plentiful. The
+earlier stages are usually hand-rolled, which is where the errors live.
 
-This vignette walks all four, using a real study: 70 days, three prompts a day,
-melatonin randomized nightly. The data shipped with the package are the ones
-actually collected.
+This vignette walks the whole lifecycle on a real study: 70 days, three prompts
+a day, melatonin randomized nightly. The data shipped with the package are the
+ones actually collected.
 
 ## 1. Design
 
@@ -56,7 +56,41 @@ check_schedule(sched)
 Balanced counts, no run longer than two, and a negative lag-1 autocorrelation,
 which is what the run cap buys: the sequence alternates more than chance would.
 
-## 2. Hand the schedule to the collection tool
+## 2. How much can this design actually detect
+
+Power formulas assume independent observations. Daily measurements from one
+person are not: today's mood is correlated with yesterday's, so each new day
+carries less information than a genuinely new observation would.
+
+`sim_power()` simulates studies of the given length and analyses each one twice,
+with and without an AR(1) error structure.
+
+```{r}
+sim_power(n_days = 70, effect = 0.5, phi = 0.4, n_sims = 200, seed = 2)
+```
+
+Ignoring the dependence costs power here, but it does not create false positives.
+That is a property of the schedule, not a general fact. Compare the same
+autocorrelation under a design that runs control for the first half and treatment
+for the second:
+
+```{r}
+sim_power(n_days = 70, effect = 0, phi = 0.7, n_sims = 200, seed = 4,
+          schedule = rep(c(0, 1), each = 35))
+```
+
+With no effect at all, ordinary least squares rejects the null in roughly four
+tests out of ten, at a nominal five percent level. A slowly changing schedule is
+nearly collinear with a slowly drifting error, so the drift is readily mistaken
+for an effect. A rapidly alternating one is nearly orthogonal to it, and the
+drift cancels across adjacent days instead.
+
+This is what the `max_run` constraint is protecting. It is usually justified as
+avoiding confounding with time, which is true but understates it: the constraint
+is what keeps the inference valid when the residuals are dependent, which in
+intensive longitudinal data they always are.
+
+## 3. Hand the schedule to the collection tool
 
 `write_schedule()` writes the day-to-condition mapping as JSON.
 
@@ -71,7 +105,7 @@ designed here can be loaded onto a phone without an intermediate step. Generatio
 and execution stay separate on purpose: an instrument that can also rewrite the
 randomization is an instrument that can silently unblind a study.
 
-## 3. Read what came back, and check it
+## 4. Read what came back, and check it
 
 The study data are bundled with the package. Real files rarely use the column name
 you expect, so `read_ema()` takes the name of the timestamp column.
@@ -121,7 +155,7 @@ bad input can act on it:
 stopifnot(v$n_issues == 0)
 ```
 
-## 4. Compliance, and why the definition matters
+## 5. Compliance, and why the definition matters
 
 Compliance in EMA studies is usually reported as records divided by prompts. On
 these data that gives:
@@ -163,7 +197,7 @@ Response rates were not equal across the day. Whether the pattern is large enoug
 to matter is a judgement about the study, but it is the kind of thing worth seeing
 before treating missingness as random.
 
-## 5. Analysis
+## 6. Analysis
 
 From here the data are ordinary. `nof1kit` deliberately stops at the boundary of
 analysis: intensive longitudinal data are well served by existing tools, and the
