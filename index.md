@@ -1,0 +1,116 @@
+# nof1kit
+
+Design, monitor, and analyze single-case (N-of-1) intensive longitudinal
+studies in R.
+
+## The problem
+
+Single-case designs answer a question group studies cannot: does this
+work for *this* person. R already has good tools for analyzing
+single-case data, notably `scan` and `SingleCaseES`. What is missing is
+everything before the analysis.
+
+A researcher running an N-of-1 study has to generate a randomization
+schedule that satisfies the design’s constraints, get it onto whatever
+device collects the data, check what comes back, and judge whether
+enough of the scheduled prompts were actually answered to support a
+conclusion. In practice each step is done by hand, per study, and the
+resulting errors are the kind that survive to publication because
+nothing checks for them: a day index that has drifted out of step with
+the calendar, a compliance rate that counts one prompt answered three
+times as three answered prompts, a schedule whose slow alternation lets
+a drifting mood series masquerade as a treatment effect.
+
+`nof1kit` covers that gap.
+
+## What it does
+
+``` r
+
+# Design: balanced, run-constrained, reproducible from the preregistered seed
+sched <- design_schedule(n_days = 70, max_run = 2, seed = 20260218)
+check_schedule(sched)                    # counts, runs, alternations, autocorrelation
+write_schedule(sched, "schedule.json")   # straight onto the collection device
+
+# Plan: how much power does this design actually have
+sim_power(n_days = 70, effect = 0.5, phi = 0.4)
+
+# Data back
+ema <- read_ema("export.csv", start_date = "2026-02-18")
+validate_ema(ema, ranges = list(mood = c(0, 100)), n_days = 70)
+compliance(ema, start_date = "2026-02-18", n_days = 70,
+           times = c("09:00", "15:00", "21:00"))
+```
+
+Three choices are worth stating up front, because each is a position
+rather than an implementation detail.
+
+**Schedules are drawn uniformly over the constrained set.** Sampling is
+exact, by dynamic programming, not by rejection or blocking. For a
+balanced 70-day design with `max_run = 2`, fewer than one permutation in
+a million satisfies the constraint, so drawing until one fits is not
+viable. Blocked randomization is viable but restricts the sample space
+in ways that are rarely stated. Here every admissible sequence is
+equally likely, which is what a preregistration claiming “randomized”
+should mean.
+
+**Compliance counts prompts, not records.** A prompt answered three
+times counts once. A record arriving outside every response window is
+kept as data but is not evidence that a prompt was answered when it was
+asked. The two definitions differ by about three points on the study
+bundled with this package.
+
+**Power depends on the schedule, not only on its length.**
+[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
+analyses each simulated study both with and without an AR(1) error
+structure, because the cost of ignoring dependence has no fixed sign.
+Under the alternating schedules
+[`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
+produces, ignoring it is conservative: power is lost, but false
+positives are not created. Under a design that runs control for the
+first half and treatment for the second, at `phi = 0.7`, ordinary least
+squares rejects a true null about 40% of the time at a nominal 5% level.
+
+## Scope
+
+The package stops at the boundary of analysis. Intensive longitudinal
+data are well served by `lme4`, `nlme`, and `brms`, and duplicating them
+would serve nobody. What the ecosystem lacks is upstream of analysis,
+and that is what this fills.
+
+## Installation
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("haomeng797-ship-it/nof1kit")
+```
+
+## Getting started
+
+``` r
+
+vignette("nof1kit")
+```
+
+The vignette runs the whole lifecycle on data from a real 70-day study,
+included in the package.
+
+## Related
+
+- [melatonin-ema-logger](https://github.com/haomeng797-ship-it/melatonin-ema-logger):
+  iOS collection tools that read the schedules this package writes
+- [n-of-1-melatonin-study](https://github.com/haomeng797-ship-it/n-of-1-melatonin-study):
+  the study whose data ship with this package
+
+## Contributing
+
+See
+[CONTRIBUTING.md](https://haomeng797-ship-it.github.io/nof1kit/CONTRIBUTING.md).
+Bug reports and feature requests go to the [issue
+tracker](https://github.com/haomeng797-ship-it/nof1kit/issues).
+
+## License
+
+MIT. See
+[LICENSE.md](https://haomeng797-ship-it.github.io/nof1kit/LICENSE.md).
