@@ -146,14 +146,14 @@ included in the package.
 ## Contributing
 
 See
-[CONTRIBUTING.md](https://haomeng797-ship-it.github.io/nof1kit/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/haomeng797-ship-it/nof1kit/blob/main/CONTRIBUTING.md).
 Bug reports and feature requests go to the [issue
 tracker](https://github.com/haomeng797-ship-it/nof1kit/issues).
 
 ## License
 
 MIT. See
-[LICENSE.md](https://haomeng797-ship-it.github.io/nof1kit/LICENSE.md).
+[LICENSE.md](https://github.com/haomeng797-ship-it/nof1kit/blob/main/LICENSE.md).
 
 # Package index
 

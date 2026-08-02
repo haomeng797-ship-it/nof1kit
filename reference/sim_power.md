@@ -110,16 +110,17 @@ instead.
 
 ``` r
 # Power to detect a half-SD effect over 70 days, with moderate autocorrelation
-sim_power(n_days = 70, effect = 0.5, phi = 0.3, n_sims = 100, seed = 1)
+# (n_sims is kept small here; use the default 500 for a real planning run)
+sim_power(n_days = 70, effect = 0.5, phi = 0.3, n_sims = 40, seed = 1)
 #> Power over 70 days, effect 0.50 SD, phi 0.30, alpha 0.05
-#>   AR(1) model : 0.680
-#>   OLS         : 0.510
-#>   Ignoring the dependence is conservative here by 0.170.
+#>   AR(1) model : 0.575
+#>   OLS         : 0.400
+#>   Ignoring the dependence is conservative here by 0.175.
 
 # With no effect, `power` is the false positive rate
-sim_power(n_days = 70, effect = 0, phi = 0.5, n_sims = 100, seed = 1)
+sim_power(n_days = 70, effect = 0, phi = 0.5, n_sims = 40, seed = 1)
 #> False positive rate over 70 days, effect 0.00 SD, phi 0.50, alpha 0.05
-#>   AR(1) model : 0.080
+#>   AR(1) model : 0.100
 #>   OLS         : 0.000
-#>   Ignoring the dependence is conservative here by 0.080.
+#>   Ignoring the dependence is conservative here by 0.100.
 ```
