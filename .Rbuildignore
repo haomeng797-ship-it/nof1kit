@@ -4,4 +4,8 @@
 ^LICENSE\.md$
 ^\.Rproj\.user$
 ^\.github$
+^_pkgdown\.yml$
+^cran-comments\.md$
+^docs$
 ^paper$
+^pkgdown$

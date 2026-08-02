@@ -1,5 +1,9 @@
 # nof1kit
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/haomeng797-ship-it/nof1kit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/haomeng797-ship-it/nof1kit/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 Design, monitor, and analyze single-case (N-of-1) intensive longitudinal studies
 in R.
 

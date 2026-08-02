@@ -1,0 +1,19 @@
+url: https://haomeng797-ship-it.github.io/nof1kit/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: Design
+  contents:
+  - design_schedule
+  - check_schedule
+  - sim_power
+- title: Hand-off to collection
+  contents:
+  - write_schedule
+- title: Data return and quality control
+  contents:
+  - read_ema
+  - validate_ema
+  - compliance
