@@ -57,10 +57,11 @@
 #'
 #' @examples
 #' # Power to detect a half-SD effect over 70 days, with moderate autocorrelation
-#' sim_power(n_days = 70, effect = 0.5, phi = 0.3, n_sims = 100, seed = 1)
+#' # (n_sims is kept small here; use the default 500 for a real planning run)
+#' sim_power(n_days = 70, effect = 0.5, phi = 0.3, n_sims = 40, seed = 1)
 #'
 #' # With no effect, `power` is the false positive rate
-#' sim_power(n_days = 70, effect = 0, phi = 0.5, n_sims = 100, seed = 1)
+#' sim_power(n_days = 70, effect = 0, phi = 0.5, n_sims = 40, seed = 1)
 #'
 #' @export
 sim_power <- function(n_days = 70,

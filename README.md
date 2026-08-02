@@ -130,9 +130,9 @@ in the package.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Bug reports and feature requests go to
+See [CONTRIBUTING.md](https://github.com/haomeng797-ship-it/nof1kit/blob/main/CONTRIBUTING.md). Bug reports and feature requests go to
 the [issue tracker](https://github.com/haomeng797-ship-it/nof1kit/issues).
 
 ## License
 
-MIT. See [LICENSE.md](LICENSE.md).
+MIT. See [LICENSE.md](https://github.com/haomeng797-ship-it/nof1kit/blob/main/LICENSE.md).
