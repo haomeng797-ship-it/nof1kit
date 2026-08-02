@@ -55,7 +55,7 @@
 <p>Single-case (N-of-1) designs ask whether a treatment works for <em>this</em> person, rather than for the average of two hundred people who are not them.</p>
 <p>Running one is a slow commitment. You randomize a condition across days, answer a few prompts every day for two or three months, and only at the end find out whether the design could have detected anything at all. Almost none of that is tooled. The schedule gets shuffled in a script until it looks acceptable, the day-to-condition map lives in a spreadsheet, compliance is a number someone works out afterwards.</p>
 <p>Mistakes made in those steps don’t throw errors. They sit in the data and wait.</p>
-<p>While writing this package’s vignette, <code><a href="reference/validate_ema.html">validate_ema()</a></code> turned up a defect in my own 70-day dataset that I had never noticed: one study day covering two calendar dates, quietly shifting the index for the last month of the study. Every routine check had passed. The values were in range, no timestamps were duplicated, nothing was missing, and every day number sat inside 1 to 70. The only way to see it was to hold the index up against the timestamps, which nothing had ever done.</p>
+<p>While writing this package’s vignette, <code><a href="reference/validate_ema.html">validate_ema()</a></code> turned up an inconsistency in my own 70-day dataset that I had never noticed: one study day covering two calendar dates, quietly shifting the index for the last month of the study. Every routine check had passed. The values were in range, no timestamps were duplicated, nothing was missing, and every day number sat inside 1 to 70. The only way to see it was to hold the index up against the timestamps, which nothing had ever done.</p>
 <p>nof1kit is the tooling for the part of a single-case study that comes before the analysis: drawing the schedule, working out what the design can detect, handing it to whatever collects the data, and checking what comes back.</p>
 <div class="section level2">
 <h2 id="what-it-does">What it does<a class="anchor" aria-label="anchor" href="#what-it-does"></a>
@@ -78,8 +78,8 @@
 <h4 id="before-you-spend-three-months-on-it">Before you spend three months on it<a class="anchor" aria-label="anchor" href="#before-you-spend-three-months-on-it"></a>
 </h4>
 <p>An N-of-1 study is a two- or three-month commitment, so two things are worth settling before day one.</p>
-<p>Is the randomization actually random? Balanced sequences with short runs are rarer than they look: in a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies. Most scripts deal with this by redrawing until something fits, or by alternating blocks. Both change the design, just without saying so. <code><a href="reference/design_schedule.html">design_schedule()</a></code> samples the constrained set exactly, so every admissible schedule is equally likely, and the seed in your preregistration is enough to bring the whole thing back.</p>
-<p>And can the study detect anything? <code><a href="reference/sim_power.html">sim_power()</a></code> simulates it both ways, with and without the day-to-day correlation that daily measures always have. The answer depends on the schedule more than people expect. An alternating schedule loses a little power when you ignore the correlation. A first-half, second-half design loses the conclusion itself: at a lag-1 correlation of 0.7, plain OLS flags a nonexistent effect about 40% of the time.</p>
+<p>Is the randomization actually random? Balanced sequences with short runs are rarer than they look: in a 70-day design with <code>max_run = 2</code>, fewer than one shuffle in a million qualifies. Most scripts deal with this by redrawing until something fits, or by alternating blocks. Either way the sampling distribution changes, usually without being reported. <code><a href="reference/design_schedule.html">design_schedule()</a></code> samples the constrained set exactly, so every admissible schedule is equally likely, and the seed in your preregistration is enough to bring the whole thing back.</p>
+<p>And can the study detect anything? <code><a href="reference/sim_power.html">sim_power()</a></code> simulates it both ways, with and without the day-to-day correlation that daily measures always have. How much that correlation costs you depends on the schedule. An alternating one costs a little power; a first-half, second-half design can hand you a result that isn’t there. At a lag-1 correlation of 0.7, plain OLS flags a nonexistent effect about 40% of the time.</p>
 </div>
 <div class="section level4">
 <h4 id="while-it-runs">While it runs<a class="anchor" aria-label="anchor" href="#while-it-runs"></a>
@@ -91,12 +91,13 @@
 <h4 id="when-the-data-come-back">When the data come back<a class="anchor" aria-label="anchor" href="#when-the-data-come-back"></a>
 </h4>
 <p><code><a href="reference/read_ema.html">read_ema()</a></code> reads whatever the phone exported and returns a data frame with real timestamps and a study-day index. <code><a href="reference/validate_ema.html">validate_ema()</a></code> then goes looking for the quiet problems: values out of range, repeated timestamps, missing fields, and a day index that no longer matches the calendar.</p>
-<p>That last check is the one that caught the defect in my own data, and it caught it months after the fact. Run while the study is still going, the same check flags the problem on the day it appears, while it is still a five-minute fix rather than a month of mislabelled records.</p>
+<p>That last check is the one that caught the problem in my own data, and it caught it months after the fact. Run while the study is still going, the same check flags the problem on the day it appears, while it is still a five-minute fix rather than a month of mislabelled records.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>
 </h2>
+<p>The package is small on purpose. It covers the steps that are easy to get almost right, where nothing breaks at the time and the cost turns up months later.</p>
 <p>nof1kit stays out of the analysis itself. Once the data are read, checked, and the compliance is known, <code>lme4</code>, <code>nlme</code>, and <code>brms</code> already do that job better than a reimplementation here ever would. The missing piece was getting to that point cleanly, and that is the piece this package tries to be.</p>
 </div>
 <div class="section level2">

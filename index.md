@@ -16,10 +16,10 @@ and wait.
 
 While writing this package’s vignette,
 [`validate_ema()`](https://haomeng797-ship-it.github.io/nof1kit/reference/validate_ema.md)
-turned up a defect in my own 70-day dataset that I had never noticed:
-one study day covering two calendar dates, quietly shifting the index
-for the last month of the study. Every routine check had passed. The
-values were in range, no timestamps were duplicated, nothing was
+turned up an inconsistency in my own 70-day dataset that I had never
+noticed: one study day covering two calendar dates, quietly shifting the
+index for the last month of the study. Every routine check had passed.
+The values were in range, no timestamps were duplicated, nothing was
 missing, and every day number sat inside 1 to 70. The only way to see it
 was to hold the index up against the timestamps, which nothing had ever
 done.
@@ -56,8 +56,8 @@ worth settling before day one.
 Is the randomization actually random? Balanced sequences with short runs
 are rarer than they look: in a 70-day design with `max_run = 2`, fewer
 than one shuffle in a million qualifies. Most scripts deal with this by
-redrawing until something fits, or by alternating blocks. Both change
-the design, just without saying so.
+redrawing until something fits, or by alternating blocks. Either way the
+sampling distribution changes, usually without being reported.
 [`design_schedule()`](https://haomeng797-ship-it.github.io/nof1kit/reference/design_schedule.md)
 samples the constrained set exactly, so every admissible schedule is
 equally likely, and the seed in your preregistration is enough to bring
@@ -66,11 +66,11 @@ the whole thing back.
 And can the study detect anything?
 [`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md)
 simulates it both ways, with and without the day-to-day correlation that
-daily measures always have. The answer depends on the schedule more than
-people expect. An alternating schedule loses a little power when you
-ignore the correlation. A first-half, second-half design loses the
-conclusion itself: at a lag-1 correlation of 0.7, plain OLS flags a
-nonexistent effect about 40% of the time.
+daily measures always have. How much that correlation costs you depends
+on the schedule. An alternating one costs a little power; a first-half,
+second-half design can hand you a result that isn’t there. At a lag-1
+correlation of 0.7, plain OLS flags a nonexistent effect about 40% of
+the time.
 
 #### While it runs
 
@@ -101,12 +101,16 @@ then goes looking for the quiet problems: values out of range, repeated
 timestamps, missing fields, and a day index that no longer matches the
 calendar.
 
-That last check is the one that caught the defect in my own data, and it
-caught it months after the fact. Run while the study is still going, the
-same check flags the problem on the day it appears, while it is still a
-five-minute fix rather than a month of mislabelled records.
+That last check is the one that caught the problem in my own data, and
+it caught it months after the fact. Run while the study is still going,
+the same check flags the problem on the day it appears, while it is
+still a five-minute fix rather than a month of mislabelled records.
 
 ## Scope
+
+The package is small on purpose. It covers the steps that are easy to
+get almost right, where nothing breaks at the time and the cost turns up
+months later.
 
 nof1kit stays out of the analysis itself. Once the data are read,
 checked, and the compliance is known, `lme4`, `nlme`, and `brms` already
