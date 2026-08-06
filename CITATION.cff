@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+title: "nof1kit: Design, Monitor, and Analyze Single-Case (N-of-1) Intensive Longitudinal Studies"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - given-names: Miura
+    family-names: Meng
+    email: haomeng797@gmail.com
+    orcid: "https://orcid.org/0009-0004-1522-1997"
+    affiliation: "University of Pennsylvania"
+repository-code: "https://github.com/haomeng797-ship-it/nof1kit"
+url: "https://haomeng797-ship-it.github.io/nof1kit/"
+abstract: >-
+  Covers the stages of a single-case (N-of-1) experimental study that come
+  before analysis. Randomization schedules are drawn uniformly from the set of
+  sequences satisfying a run-length constraint, by counting valid completions
+  from each state with dynamic programming rather than by rejection sampling,
+  which is unworkable at realistic study lengths. Schedules export as plain
+  JSON for a mobile collection layer, incoming ecological momentary assessment
+  records are checked for out-of-range values, duplicate timestamps and day
+  indices that have drifted out of step with the calendar, and compliance is
+  counted as scheduled prompts answered inside their response window. A
+  simulation-based power function reports how much a design can detect with
+  and without an AR(1) error structure, since whether ignoring serial
+  dependence is conservative or anti-conservative depends on the schedule.
+keywords:
+  - single-case design
+  - N-of-1 trials
+  - ecological momentary assessment
+  - randomization
+  - intensive longitudinal data
+  - research infrastructure
+  - R
+license: MIT
+version: 0.1.0
