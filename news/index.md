@@ -1,5 +1,12 @@
 # Changelog
 
+## nof1kit (development version)
+
+- [`read_ema()`](https://haomeng797-ship-it.github.io/nof1kit/reference/read_ema.md)
+  no longer errors when a timestamp cannot be parsed at all; such
+  records now come back as `NA` with the documented warning, so one
+  corrupted row cannot take down the import of an otherwise good export.
+
 ## nof1kit 0.1.0
 
 First release.
