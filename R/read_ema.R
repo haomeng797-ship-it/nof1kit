@@ -25,6 +25,17 @@
 #' f <- system.file("extdata", "example_ema.csv", package = "nof1kit")
 #' if (nzchar(f)) head(read_ema(f))
 #'
+#' @srrstats {G2.6} `read_ema()` accepts the timestamp column as character,
+#'   factor, or POSIXct and normalizes it through `parse_timestamp()` before
+#'   any other routine sees it.
+#' @srrstats {G2.8} All downstream functions receive a data frame with a
+#'   POSIXct `timestamp`; `read_ema()` is the single conversion point.
+#' @srrstats {G2.9} `read_ema()` issues a warning naming the number of
+#'   timestamps that could not be parsed, so information lost in conversion is
+#'   reported rather than silently propagated as `NA`.
+#' @srrstats {G2.4} The one type conversion the package performs is explicit
+#'   and happens in a single place, `parse_timestamp()`, which turns character
+#'   or factor timestamps into POSIXct.
 #' @export
 read_ema <- function(path, start_date = NULL, tz = "UTC",
                      timestamp_col = "timestamp") {

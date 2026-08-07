@@ -63,6 +63,14 @@
 #' # With no effect, `power` is the false positive rate
 #' sim_power(n_days = 70, effect = 0, phi = 0.5, n_sims = 40, seed = 1)
 #'
+#' @srrstats {G5.8c} All-identical fields: `sim_power()` with `sd = 0`
+#'   produces degenerate fits, which are counted in `n_failed` and reported,
+#'   rather than erroring.
+#' @srrstats {G2.0} Lengths are asserted where a mismatch would be silent:
+#'   `sim_power()` rejects a `schedule` whose length is not `n_days`, and
+#'   `compliance()` requires a `timestamp` column rather than positional input.
+#' @srrstats {G2.0a} Expected lengths are stated in the `@param` entries, e.g.
+#'   `schedule` in `sim_power()` is documented as a vector of length `n_days`.
 #' @export
 sim_power <- function(n_days = 70,
                       effect = 0.5,

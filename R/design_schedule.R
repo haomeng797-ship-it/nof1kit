@@ -35,6 +35,17 @@
 #' head(sched)
 #' check_schedule(sched)
 #'
+#' @srrstats {G1.1} `design_schedule()` documents that its exact sampler is,
+#'   to the author's knowledge, the first R implementation of uniform sampling
+#'   over run-constrained balanced sequences for this design problem; existing
+#'   single-case packages (scan, SingleCaseES, SCDA) implement analysis rather
+#'   than design generation, and generic approaches use rejection sampling or
+#'   blocking, both of which change the sampling distribution.
+#' @srrstats {G5.4} Correctness is tested against properties that hold by
+#'   construction: schedules are balanced, contain no run longer than
+#'   `max_run`, and reproduce exactly from a seed.
+#' @srrstats {G5.5} Every test involving randomness fixes a seed, and
+#'   `design_schedule()` requires one by design.
 #' @export
 design_schedule <- function(n_days,
                             conditions = c(0L, 1L),

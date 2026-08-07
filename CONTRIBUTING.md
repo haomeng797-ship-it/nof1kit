@@ -36,3 +36,13 @@ Open an issue with the question label. There is no separate mailing list.
 ## Code of conduct
 
 Participation is governed by the [Contributor Covenant](CODE_OF_CONDUCT.md).
+
+## Life cycle
+
+nof1kit is stable and maintained. The seven exported functions and their
+arguments are considered settled: the file formats they read and write are
+shared with a mobile collection layer, so breaking them would break studies
+already in the field. Future work is expected to be additive, for example
+further quality checks in `validate_ema()` or further error structures in
+`sim_power()`. Bug reports and feature requests are welcome on the issue
+tracker.

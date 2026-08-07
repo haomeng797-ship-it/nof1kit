@@ -29,6 +29,12 @@
 #' v <- validate_ema(d, ranges = list(mood = c(0, 100)))
 #' v
 #'
+#' @srrstats {G2.13} `validate_ema()` is a dedicated missing-data check: it
+#'   reports absent required columns, missing values in required fields, and
+#'   day indices inconsistent with the calendar.
+#' @srrstats {EA3.0} `validate_ema()` performs the checking that is otherwise
+#'   done by hand: it returns a row-level table of violations rather than
+#'   requiring the analyst to inspect the data manually.
 #' @export
 validate_ema <- function(data,
                          ranges = NULL,

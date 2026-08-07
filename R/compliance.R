@@ -37,6 +37,14 @@
 #' compliance(d, start_date = "2026-02-18", n_days = 2,
 #'            times = c("09:00", "15:00", "21:00"))
 #'
+#' @srrstats {EA3.1} `compliance()` standardizes a quantity usually computed
+#'   ad hoc, and makes the definitional choice explicit by reporting
+#'   off-window records separately instead of folding them in.
+#' @srrstats {EA5.2} Screen output never relies on default numeric printing:
+#'   `print.nof1_compliance()` and `print.nof1_power()` format through
+#'   `sprintf()` with explicit precision.
+#' @srrstats {G5.8a} Zero-length input: `compliance()` on an empty record set
+#'   returns `NA` for the rate and prints "No prompts have occurred yet".
 #' @export
 compliance <- function(data,
                        start_date,
