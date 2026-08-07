@@ -1,0 +1,110 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "nof1kit",
+  "description": "Tools for the stages of a single-case (N-of-1) experimental study that come before analysis: generating randomization schedules that can be preregistered and reproduced exactly, under run-length constraints, exporting them for mobile data collection, validating incoming ecological momentary assessment (EMA) records, and monitoring compliance. Designed around the workflow of a 70-day randomized N-of-1 study collected with stock 'iOS' tools at 92.9% compliance; the package ships with that study's complete dataset.",
+  "name": "nof1kit: Design, Monitor, and Analyze Single-Case (N-of-1) Intensive\n    Longitudinal Studies",
+  "relatedLink": "https://haomeng797-ship-it.github.io/nof1kit/",
+  "codeRepository": "https://github.com/haomeng797-ship-it/nof1kit",
+  "issueTracker": "https://github.com/haomeng797-ship-it/nof1kit/issues",
+  "license": "https://spdx.org/licenses/MIT",
+  "version": "0.1.0",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Miura",
+      "familyName": "Meng",
+      "email": "haomeng797@gmail.com",
+      "@id": "https://orcid.org/0009-0004-1522-1997"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Miura",
+      "familyName": "Meng",
+      "email": "haomeng797@gmail.com",
+      "@id": "https://orcid.org/0009-0004-1522-1997"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "jsonlite",
+      "name": "jsonlite",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "tools",
+      "name": "tools"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "utils",
+      "name": "utils"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "84.081KB",
+  "releaseNotes": "https://github.com/haomeng797-ship-it/nof1kit/blob/main/NEWS.md",
+  "readme": "https://github.com/haomeng797-ship-it/nof1kit/blob/main/README.md",
+  "contIntegration": "https://github.com/haomeng797-ship-it/nof1kit/actions/workflows/R-CMD-check.yaml",
+  "keywords": ["ema", "r-package", "single-case-design"]
+}

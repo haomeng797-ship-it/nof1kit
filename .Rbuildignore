@@ -10,3 +10,4 @@
 ^paper$
 ^pkgdown$
 ^CITATION\.cff$
+^codemeta\.json$

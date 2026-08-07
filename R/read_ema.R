@@ -105,7 +105,19 @@ parse_timestamp <- function(x, tz = "UTC") {
   }
   fallback <- is.na(out) & !is.na(x)
   if (any(fallback)) {
-    out[fallback] <- as.POSIXct(x[fallback], tz = tz)
+    # as.POSIXct() errors on strings it cannot read at all, so parse these
+    # one at a time and let the failures come back as NA for the caller to
+    # count and warn about.
+    parsed <- vapply(
+      x[fallback],
+      function(s) {
+        tryCatch(as.numeric(as.POSIXct(s, tz = tz)),
+                 error = function(e) NA_real_)
+      },
+      numeric(1),
+      USE.NAMES = FALSE
+    )
+    out[fallback] <- as.POSIXct(parsed, origin = "1970-01-01", tz = tz)
   }
   out
 }
