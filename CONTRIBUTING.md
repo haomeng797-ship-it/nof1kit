@@ -41,3 +41,15 @@ list.
 
 Participation is governed by the [Contributor
 Covenant](https://haomeng797-ship-it.github.io/nof1kit/CODE_OF_CONDUCT.md).
+
+## Life cycle
+
+nof1kit is stable and maintained. The seven exported functions and their
+arguments are considered settled: the file formats they read and write
+are shared with a mobile collection layer, so breaking them would break
+studies already in the field. Future work is expected to be additive,
+for example further quality checks in
+[`validate_ema()`](https://haomeng797-ship-it.github.io/nof1kit/reference/validate_ema.md)
+or further error structures in
+[`sim_power()`](https://haomeng797-ship-it.github.io/nof1kit/reference/sim_power.md).
+Bug reports and feature requests are welcome on the issue tracker.
