@@ -1,7 +1,7 @@
 Package: nof1kit
 Title: Design, Monitor, and Analyze Single-Case (N-of-1) Intensive
     Longitudinal Studies
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R:
     person("Miura", "Meng", email = "haomeng797@gmail.com",
            role = c("aut", "cre"),

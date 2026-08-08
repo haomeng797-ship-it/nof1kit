@@ -1,4 +1,4 @@
-# nof1kit (development version)
+# nof1kit 0.1.0.9000 (development version)
 
 * `read_ema()` no longer errors when a timestamp cannot be parsed at all;
   such records now come back as `NA` with the documented warning, so one
