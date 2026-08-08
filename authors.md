@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/haomeng797-ship-it/nof1kit/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/haomeng797-ship-it/nof1kit/blob/v0.1.0/DESCRIPTION)
 
 Meng M (2026). *nof1kit: Design, Monitor, and Analyze Single-Case
 (N-of-1) Intensive Longitudinal Studies*. R package version 0.1.0,
