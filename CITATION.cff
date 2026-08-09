@@ -33,3 +33,8 @@ keywords:
   - R
 license: MIT
 version: 0.1.0
+doi: "10.32614/CRAN.package.nof1kit"
+identifiers:
+  - type: url
+    value: "https://CRAN.R-project.org/package=nof1kit"
+    description: CRAN release page
