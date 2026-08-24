@@ -31,6 +31,12 @@
 #' @srrstats {G1.5} The vignette runs the full lifecycle on the bundled study
 #'   data and reproduces every quantitative claim made about the package,
 #'   including the design-dependent behaviour of OLS under AR(1) errors.
+#' @srrstats {G1.6} The README compares the package with SCRT, scan, and
+#'   SingleCaseES. Those packages overlap in single-case design, simulation,
+#'   or analysis, but do not expose a directly equivalent end-to-end workflow
+#'   for run-constrained daily schedules, mobile export, EMA validation, and
+#'   prompt-level compliance; output-level benchmarking is therefore limited
+#'   to the shared design properties tested in this package.
 #'
 #' @srrstats {G2.1} Types are asserted before use: `compliance()` requires a
 #'   data frame carrying `timestamp`, and `read_ema()` errors when the named
@@ -109,12 +115,6 @@ NULL
 #'
 #' Standards that do not apply to this package, with reasons.
 #'
-#' @srrstats {G1.6} The README compares the package with SCRT, scan, and
-#'   SingleCaseES. Those packages overlap in single-case design, simulation,
-#'   or analysis, but do not expose a directly equivalent end-to-end workflow
-#'   for run-constrained daily schedules, mobile export, EMA validation, and
-#'   prompt-level compliance; output-level benchmarking is therefore limited
-#'   to the shared design properties tested in this package.
 #' @srrstatsNA {G2.3, G2.3a, G2.3b} No parameter takes one of a fixed set of
 #'   character values. The only character inputs are a column name, a file
 #'   path, and clock times, none of which have an enumerable domain that
