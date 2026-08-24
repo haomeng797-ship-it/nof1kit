@@ -35,12 +35,13 @@
 #' head(sched)
 #' check_schedule(sched)
 #'
-#' @srrstats {G1.1} `design_schedule()` documents that its exact sampler is,
-#'   to the author's knowledge, the first R implementation of uniform sampling
-#'   over run-constrained balanced sequences for this design problem; existing
-#'   single-case packages (scan, SingleCaseES, SCDA) implement analysis rather
-#'   than design generation, and generic approaches use rejection sampling or
-#'   blocking, both of which change the sampling distribution.
+#' @srrstats {G1.1} Existing single-case packages provide important adjacent
+#'   functionality: SCRT designs phase, alternation, and multiple-baseline
+#'   experiments, while scan and SingleCaseES emphasize simulation and
+#'   downstream analysis. `design_schedule()` addresses the narrower problem
+#'   of drawing a balanced daily schedule uniformly under a maximum-run
+#'   constraint and connects that schedule to power simulation, mobile export,
+#'   and EMA quality control. The comparison is summarized in the README.
 #' @srrstats {G5.4} Correctness is tested against properties that hold by
 #'   construction: schedules are balanced, contain no run longer than
 #'   `max_run`, and reproduce exactly from a seed.

@@ -109,9 +109,12 @@ NULL
 #'
 #' Standards that do not apply to this package, with reasons.
 #'
-#' @srrstatsNA {G1.6} No other R package implements these steps, so there is
-#'   no alternative implementation to compare performance against. The nearest
-#'   relatives (scan, SingleCaseES, SCDA) begin after the data are collected.
+#' @srrstats {G1.6} The README compares the package with SCRT, scan, and
+#'   SingleCaseES. Those packages overlap in single-case design, simulation,
+#'   or analysis, but do not expose a directly equivalent end-to-end workflow
+#'   for run-constrained daily schedules, mobile export, EMA validation, and
+#'   prompt-level compliance; output-level benchmarking is therefore limited
+#'   to the shared design properties tested in this package.
 #' @srrstatsNA {G2.3, G2.3a, G2.3b} No parameter takes one of a fixed set of
 #'   character values. The only character inputs are a column name, a file
 #'   path, and clock times, none of which have an enumerable domain that
