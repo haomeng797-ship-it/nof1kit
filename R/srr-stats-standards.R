@@ -12,31 +12,9 @@
 #'
 #' @srrstatsVerbose TRUE
 #'
-#' @srrstats {G1.0} Primary references are given in the `@references` sections
-#'   of `design_schedule()` (Edgington 1980, on randomization tests for
-#'   single-subject experiments) and in the package's JOSS paper, which also
-#'   cites Kravitz & Duan (2014), Vohra et al. (2015, the CENT extension) and
-#'   Shiffman et al. (2008) for the EMA measurement model.
-#' @srrstats {G1.2} A Life Cycle Statement is given in `CONTRIBUTING.md`:
-#'   the package is stable and maintained, the interface is considered
-#'   settled, and future work is additive rather than breaking.
-#' @srrstats {G1.3} Statistical terms used in the interface are defined where
-#'   they appear: "run" and `max_run` in `design_schedule()`, lag-1
-#'   autocorrelation and the distinction between innovation and marginal SD in
-#'   `sim_power()`, and the prompt-level definition of compliance (as against
-#'   records-over-prompts) in the Details of `compliance()`.
 #' @srrstats {G1.4} All exported functions are documented with roxygen2.
 #' @srrstats {G1.4a} Internal functions carry roxygen documentation ending in
 #'   `@noRd`; see `sample_constrained()` and `parse_timestamp()`.
-#' @srrstats {G1.5} The vignette runs the full lifecycle on the bundled study
-#'   data and reproduces every quantitative claim made about the package,
-#'   including the design-dependent behaviour of OLS under AR(1) errors.
-#' @srrstats {G1.6} The README compares the package with SCRT, scan, and
-#'   SingleCaseES. Those packages overlap in single-case design, simulation,
-#'   or analysis, but do not expose a directly equivalent end-to-end workflow
-#'   for run-constrained daily schedules, mobile export, EMA validation, and
-#'   prompt-level compliance; output-level benchmarking is therefore limited
-#'   to the shared design properties tested in this package.
 #'
 #' @srrstats {G2.1} Types are asserted before use: `compliance()` requires a
 #'   data frame carrying `timestamp`, and `read_ema()` errors when the named
@@ -65,18 +43,6 @@
 #'   a real data set with known properties, in addition to constructed cases.
 #' @srrstats {G5.1} That data set ships in `inst/extdata` and is reachable via
 #'   `system.file()`, so users can rerun every test and example.
-#' @srrstats {G5.2} Error and warning behaviour is tested explicitly in
-#'   `test-print-and-edges.R`.
-#' @srrstats {G5.2a} Each `stop()` and `warning()` message in the package is
-#'   distinct in wording, so a test can identify which condition fired.
-#' @srrstats {G5.2b} Tests trigger each condition and match on its message:
-#'   the required-seed error, the `n_days`/`max_run` feasibility errors, the
-#'   missing-file and unparseable-file errors, the unparseable-timestamp
-#'   warning, and the `phi` and `schedule`-length errors of `sim_power()`.
-#' @srrstats {G5.8} Edge conditions are tested.
-#' @srrstats {G5.8b} Unsupported types: `read_ema()` on a file that does not
-#'   parse into a table, and on a string no date parser can read, are both
-#'   tested.
 #'
 #' @srrstats {EA1.0} The target audience is stated in the README and the
 #'   vignette: researchers running single-case or N-of-1 studies who need the
