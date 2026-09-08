@@ -8,16 +8,19 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/haomeng797-ship-it/nof1kit/blob/main/DESCRIPTION)
+[`inst/CITATION`](https://github.com/haomeng797-ship-it/nof1kit/blob/main/inst/CITATION)
 
-Meng M (2026). *nof1kit: Design, Monitor, and Analyze Single-Case
-(N-of-1) Intensive Longitudinal Studies*. R package version 0.1.0.9000,
-<https://github.com/haomeng797-ship-it/nof1kit>.
+Meng M (2026). *nof1kit: Design, Monitor, and Validate Single-Case
+(N-of-1) Studies*.
+[doi:10.32614/CRAN.package.nof1kit](https://doi.org/10.32614/CRAN.package.nof1kit).
+R package version 0.1.0.9000,
+<https://CRAN.R-project.org/package=nof1kit>.
 
     @Manual{,
-      title = {nof1kit: Design, Monitor, and Analyze Single-Case (N-of-1) Intensive Longitudinal Studies},
+      title = {nof1kit: Design, Monitor, and Validate Single-Case (N-of-1) Studies},
       author = {Miura Meng},
       year = {2026},
       note = {R package version 0.1.0.9000},
-      url = {https://github.com/haomeng797-ship-it/nof1kit},
+      doi = {10.32614/CRAN.package.nof1kit},
+      url = {https://CRAN.R-project.org/package=nof1kit},
     }

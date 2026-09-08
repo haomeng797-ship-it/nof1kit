@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Design, Monitor, and Analyze Single-Case (N-of-1) Intensive Longitudinal Studies • nof1kit</title>
+<title>Design, Monitor, and Validate Single-Case (N-of-1) Studies • nof1kit</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Design, Monitor, and Analyze Single-Case (N-of-1) Intensive Longitudinal Studies">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Design, Monitor, and Validate Single-Case (N-of-1) Studies">
 <meta name="description" content="Tools for the stages of a single-case (N-of-1) experimental study that come before analysis: generating randomization schedules that can be preregistered and reproduced exactly, under run-length constraints, exporting them for mobile data collection, validating incoming ecological momentary assessment (EMA) records, and monitoring compliance. Designed around the workflow of a 70-day randomized N-of-1 study collected with stock iOS tools at 92.9% compliance; the package ships with that study's complete dataset.">
 <meta property="og:description" content="Tools for the stages of a single-case (N-of-1) experimental study that come before analysis: generating randomization schedules that can be preregistered and reproduced exactly, under run-length constraints, exporting them for mobile data collection, validating incoming ecological momentary assessment (EMA) records, and monitoring compliance. Designed around the workflow of a 70-day randomized N-of-1 study collected with stock iOS tools at 92.9% compliance; the package ships with that study's complete dataset.">
 </head>
@@ -104,7 +104,11 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<code class="sourceCode R"><span><span class="co"># Released version</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nof1kit"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Development version</span></span>
+<span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"haomeng797-ship-it/nof1kit"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -113,6 +117,18 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"nof1kit"</span><span class="op">)</span></span></code></pre></div>
 <p>The vignette runs the whole lifecycle on data from a real 70-day study, included in the package.</p>
+</div>
+<div class="section level2">
+<h2 id="how-it-relates-to-other-single-case-packages">How it relates to other single-case packages<a class="anchor" aria-label="anchor" href="#how-it-relates-to-other-single-case-packages"></a>
+</h2>
+<p>Several R packages cover complementary parts of the single-case workflow. <a href="https://CRAN.R-project.org/package=SCRT" class="external-link"><code>SCRT</code></a> designs phase, alternation, and multiple-baseline experiments and performs randomization tests. <a href="https://CRAN.R-project.org/package=scan" class="external-link"><code>scan</code></a> provides a broad suite for organizing, visualizing, simulating, and analyzing single-case data, while <a href="https://CRAN.R-project.org/package=SingleCaseES" class="external-link"><code>SingleCaseES</code></a> focuses on effect-size estimation.</p>
+<p>nof1kit does not replace those analysis tools. It focuses on the operational steps around an intensive longitudinal N-of-1 study: drawing balanced daily schedules under a maximum-run constraint, evaluating a proposed schedule by simulation under serial dependence, exporting the schedule to a collection tool, validating timestamped EMA records, and monitoring prompt-level compliance. The output is an ordinary data frame that can be passed to an analysis package afterwards.</p>
+</div>
+<div class="section level2">
+<h2 id="data-ethics-and-privacy">Data ethics and privacy<a class="anchor" aria-label="anchor" href="#data-ethics-and-privacy"></a>
+</h2>
+<p>The bundled example is the author’s own self-experiment. It contains no names, account identifiers, or records from third-party participants, but it does contain exact timestamps and health-related self-ratings and therefore should not be treated as anonymous. The author, who is the sole participant and data controller, chose to publish these records so that the package’s validation and compliance results are reproducible.</p>
+<p>nof1kit reads and writes local files only; it does not upload study data. Users collecting data from anyone else remain responsible for informed consent, research-ethics review where applicable, data minimization, and secure storage.</p>
 </div>
 <div class="section level2">
 <h2 id="related">Related<a class="anchor" aria-label="anchor" href="#related"></a>

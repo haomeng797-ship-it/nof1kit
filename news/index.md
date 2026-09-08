@@ -6,6 +6,10 @@
   no longer errors when a timestamp cannot be parsed at all; such
   records now come back as `NA` with the documented warning, so one
   corrupted row cannot take down the import of an otherwise good export.
+- The README now distinguishes nof1kit from overlapping single-case
+  packages and documents the privacy and ethics considerations of the
+  bundled self-experiment data.
+- Added an R-native `inst/CITATION` entry alongside `CITATION.cff`.
 
 ## nof1kit 0.1.0
 
