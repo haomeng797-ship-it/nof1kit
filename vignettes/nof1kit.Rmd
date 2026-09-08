@@ -15,6 +15,31 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(nof1kit)
 ```
 
+```{r srr-documentation, echo = FALSE, eval = FALSE}
+#' @srrstats {G1.0} Primary references are given in the `@references` sections
+#'   of `design_schedule()` (Edgington 1980, on randomization tests for
+#'   single-subject experiments) and in the package's JOSS paper, which also
+#'   cites Kravitz & Duan (2014), Vohra et al. (2015, the CENT extension) and
+#'   Shiffman et al. (2008) for the EMA measurement model.
+#' @srrstats {G1.2} A Life Cycle Statement is given in `CONTRIBUTING.md`:
+#'   the package is stable and maintained, the interface is considered
+#'   settled, and future work is additive rather than breaking.
+#' @srrstats {G1.3} Statistical terms used in the interface are defined where
+#'   they appear: "run" and `max_run` in `design_schedule()`, lag-1
+#'   autocorrelation and the distinction between innovation and marginal SD in
+#'   `sim_power()`, and the prompt-level definition of compliance (as against
+#'   records-over-prompts) in the Details of `compliance()`.
+#' @srrstats {G1.5} The vignette runs the full lifecycle on the bundled study
+#'   data and reproduces every quantitative claim made about the package,
+#'   including the design-dependent behaviour of OLS under AR(1) errors.
+#' @srrstats {G1.6} The README compares the package with SCRT, scan, and
+#'   SingleCaseES. Those packages overlap in single-case design, simulation,
+#'   or analysis, but do not expose a directly equivalent end-to-end workflow
+#'   for run-constrained daily schedules, mobile export, EMA validation, and
+#'   prompt-level compliance; output-level benchmarking is therefore limited
+#'   to the shared design properties tested in this package.
+```
+
 A single-case (N-of-1) experiment has a lifecycle: design a randomization
 schedule, work out what it can detect, collect data against it, check what came
 back, and analyze it. Packages for single-case analysis are plentiful. The

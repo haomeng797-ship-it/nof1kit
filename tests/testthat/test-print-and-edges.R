@@ -1,3 +1,16 @@
+#' @srrstats {G5.2} Error and warning behaviour is tested explicitly in
+#'   `test-print-and-edges.R`.
+#' @srrstats {G5.2a} Each `stop()` and `warning()` message in the package is
+#'   distinct in wording, so a test can identify which condition fired.
+#' @srrstats {G5.2b} Tests trigger each condition and match on its message:
+#'   the required-seed error, the `n_days`/`max_run` feasibility errors, the
+#'   missing-file and unparseable-file errors, the unparseable-timestamp
+#'   warning, and the `phi` and `schedule`-length errors of `sim_power()`.
+#' @srrstats {G5.8} Edge conditions are tested.
+#' @srrstats {G5.8b} Unsupported types: `read_ema()` on a file that does not
+#'   parse into a table, and on a string no date parser can read, are both
+#'   tested.
+
 # print methods -----------------------------------------------------------
 
 test_that("print.nof1_compliance reports the rate and off-window records", {

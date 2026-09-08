@@ -39,12 +39,17 @@ vignette runs the full lifecycle on those data.
 
 R serves the analysis of single-case data well, through packages such as
 `scan` [@scan] and `SingleCaseES` [@singlecasees], and intensive longitudinal
-models are well covered by the mixed-model ecosystem. Everything upstream of
-analysis, however, is usually hand-rolled per study: a script that shuffles
-conditions until a sequence "looks right", a spreadsheet mapping days to
-assignments, an ad hoc compliance figure. Errors introduced there are the kind
-that survive to publication, because nothing checks for them. Three examples,
-each of which `nof1kit` addresses and demonstrates on its bundled data:
+models are well covered by the mixed-model ecosystem. `SCRT` [@scrt] also supports the
+design and randomization testing of phase, alternation, and multiple-baseline
+single-case experiments. nof1kit complements these tools with an integrated
+workflow for balanced, run-constrained daily schedules, design-specific power
+simulation under serial dependence, mobile schedule export, EMA validation,
+and prompt-level compliance monitoring. These operational steps are otherwise
+often hand-rolled per study: a script that shuffles conditions until a sequence
+"looks right", a spreadsheet mapping days to assignments, an ad hoc compliance
+figure. Errors introduced there are the kind that survive to publication,
+because nothing checks for them. Three examples, each of which `nof1kit`
+addresses and demonstrates on its bundled data:
 
 **Randomization that is not what the preregistration says.** Restricted
 randomization is standard in N-of-1 designs, since long runs of one condition
@@ -103,6 +108,11 @@ documentation of randomization, protocol deviations, and adherence.
 # Acknowledgements
 
 The bundled dataset was collected by the author as a self-experiment; no
-external funding supported this work.
+third-party participants are represented. It includes exact timestamps and
+health-related self-ratings and therefore is not described as anonymous. The
+author, as the sole participant and data controller, chose to publish the
+records to make the validation and compliance examples reproducible. nof1kit
+processes local files and does not transmit study data. No external funding
+supported this work.
 
 # References

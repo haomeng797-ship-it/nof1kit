@@ -108,6 +108,10 @@ point cleanly, and that is the piece this package tries to be.
 ## Installation
 
 ```r
+# Released version
+install.packages("nof1kit")
+
+# Development version
 # install.packages("remotes")
 remotes::install_github("haomeng797-ship-it/nof1kit")
 ```
@@ -120,6 +124,37 @@ vignette("nof1kit")
 
 The vignette runs the whole lifecycle on data from a real 70-day study, included
 in the package.
+
+## How it relates to other single-case packages
+
+Several R packages cover complementary parts of the single-case workflow.
+[`SCRT`](https://CRAN.R-project.org/package=SCRT) designs phase, alternation,
+and multiple-baseline experiments and performs randomization tests.
+[`scan`](https://CRAN.R-project.org/package=scan) provides a broad suite for
+organizing, visualizing, simulating, and analyzing single-case data, while
+[`SingleCaseES`](https://CRAN.R-project.org/package=SingleCaseES) focuses on
+effect-size estimation.
+
+nof1kit does not replace those analysis tools. It focuses on the operational
+steps around an intensive longitudinal N-of-1 study: drawing balanced daily
+schedules under a maximum-run constraint, evaluating a proposed schedule by
+simulation under serial dependence, exporting the schedule to a collection
+tool, validating timestamped EMA records, and monitoring prompt-level
+compliance. The output is an ordinary data frame that can be passed to an
+analysis package afterwards.
+
+## Data ethics and privacy
+
+The bundled example is the author's own self-experiment. It contains no names,
+account identifiers, or records from third-party participants, but it does
+contain exact timestamps and health-related self-ratings and therefore should
+not be treated as anonymous. The author, who is the sole participant and data
+controller, chose to publish these records so that the package's validation and
+compliance results are reproducible.
+
+nof1kit reads and writes local files only; it does not upload study data. Users
+collecting data from anyone else remain responsible for informed consent,
+research-ethics review where applicable, data minimization, and secure storage.
 
 ## Related
 
